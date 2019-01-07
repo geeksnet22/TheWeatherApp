@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -33,14 +34,13 @@ import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements LocationListener{
 
-    private Button button;
     public EditText cityName;
-    private String weatherInfo;
     private LocationManager locationManager;
     private static final int MY_PERMISSION_REQUEST_LOCATION = 99;
 
     /**
-     * check if the location permission in granted, return false if not granted, true otherwise
+     * check if the location permission in granted. Prompt user to allow access to location,
+     * return false if user chooses to disallows the permission, true otherwise
      * @return true if permission to access location is granted, false otherwise
      */
     public boolean checkLocationPermission()
@@ -49,15 +49,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED)
         {
-            // should we show an explanation
+            /* should we show an explanation */
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION))
             {
+                /* show explanation to the user about requiring location permission */
                 new AlertDialog.Builder(this).setTitle("Permission Needed")
                         .setMessage("Permission needed to access location to function properly")
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // prompt the user once explanation has been shown
+                        /* prompt the user once explanation has been shown */
                         ActivityCompat.requestPermissions(MainActivity.this,
                                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_LOCATION);
                     }
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             }
             else
             {
-                // no explanation needed, just request the permission
+                /* no explanation needed, just request the permission */
                 ActivityCompat.requestPermissions(this,
                         new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSION_REQUEST_LOCATION);
             }
@@ -77,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /**
+     * This function is run when user's location changes
+     * @param location
+     */
     @Override
     public void onLocationChanged(Location location) {
 
@@ -130,35 +135,92 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        button = findViewById(R.id.button);
-        cityName = findViewById(R.id.cityName);
-        this.checkLocationPermission();
-        Location location = this.getLocation();
-        /* if the location permission was granted */
-        int latitude = (int) location.getLatitude();
-        int longitude = (int) location.getLongitude();
-        /* get weather information corresponding to user's location */
-        String userLocationInfo = getWeatherInfo(latitude, longitude);
-        try {
-            JSONObject jsonObject = new JSONObject(userLocationInfo);
+    public String formatWeatherInfo(JSONObject rawData)
+    {
+        String weatherInfo = "";
+        try
+        {
+            /* location information */
+            String coordInfo = rawData.getString("coord");
+            /* JSON object representing location coordinates */
+            JSONObject jsonObjectCoord = new JSONObject(coordInfo);
+            int lon = jsonObjectCoord.getInt("lon");
+            int lat = jsonObjectCoord.getInt("lat");
 
+            /* get main weather information */
+            weatherInfo = rawData.getString("weather");
+            /* JSON array containing various aspects of weather */
+            JSONArray jsonArrayWeather = new JSONArray(weatherInfo);
+            JSONObject jsonPartWeather = jsonArrayWeather.getJSONObject(0);
+
+            /* get information about other weather conditions */
+            String mainInfo = rawData.getString("main");
+            JSONObject jsonObjectMain = new JSONObject(mainInfo);
+            int temp = jsonObjectMain.getInt("temp");
+            int temp_min = jsonObjectMain.getInt("temp_min");
+            int temp_max = jsonObjectMain.getInt("temp_max");
+            int humidity = jsonObjectMain.getInt("humidity");
+
+            /* build string containing all the information to be shown on screen */
+            weatherInfo = jsonPartWeather.getString("main") + ": " + jsonPartWeather.getString("description")
+                    + "\nCurr temp: " + String.valueOf(Math.round(temp - 273.15)) + "C" +  "\nMin temp: " +
+                    String.valueOf(Math.round(temp_min - 273.15)) + "C"
+                    + "\nMax temp: " + String.valueOf(Math.round(temp_max - 273.15)) + "C" + "\nHumidity: " + humidity + "%"
+                    + "\nLongitude: " + lon + "\nLatitude: " + lat;
+            return weatherInfo;
         }
         catch (JSONException e)
         {
             e.printStackTrace();
         }
+        return "";
     }
 
-    public String getWeatherInfo(int lati, int longi) {
+    /* This function is run when the  app first starts */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        cityName = findViewById(R.id.cityName);
+        this.checkLocationPermission();
+        /* get location of the user */
+        Location location = this.getLocation();
+        /* if permission to access user's location is granted */
+        if (location != null)
+        {
+            /* if the location permission was granted */
+            float latitude = (int) location.getLatitude();    /* latitude corresponding to user location */
+            float longitude = (int) location.getLongitude();  /* longitude corresponding to user location */
+            /* get string consisting of weather information corresponding to user's location */
+            String userLocationInfo = getWeatherInfo(latitude, longitude);
+            try {
+                JSONObject jsonObject = new JSONObject(userLocationInfo);
+                String userInfo = this.formatWeatherInfo(jsonObject);
+                if (userInfo.isEmpty()) {
+                    ((TextView) findViewById(R.id.userInfo)).setText("fucked up");
+                } else {
+                    ((TextView) findViewById(R.id.userInfo)).setText(this.formatWeatherInfo(jsonObject));
+                }
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Return string consisting of weather information
+     * @param lati latitude corresponding to the location
+     * @param longi longitude corresponding to the location
+     * @return Return string consisting of weather information
+     */
+    public String getWeatherInfo(float lati, float longi) {
         ExtractData data = new ExtractData();
         String result = "";
         try {
             /* retrieve weather information as a string */
-            return data.execute("api.openweathermap.org/data/2.5/weather?lat=" + lati + "&lon=" + longi).get();
+            return data.execute("http://api.openweathermap.org/data/2.5/weather?lat=" + lati + "&lon=" + longi + "&APPID=e34ed2404aade8ba726f190aa26da0c8").get();
         }
         catch (Exception e)
         {
@@ -166,6 +228,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /**
+     * Return user's last known location, return null is location access is not permitted
+     * @return user's last known location
+     */
     public Location getLocation()
     {
         /* setup the location manager */
@@ -180,6 +246,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return null;
     }
 
+    /**
+     *  Process city name entered by the user and open new
+     *  activity to show weather information accordingly */
     public void clicked(View view)
     {
         String name = cityName.getText().toString();
@@ -187,7 +256,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         String result = "";
         try {
             /* retrieve weather information as a string */
-            result = data.execute("http://api.openweathermap.org/data/2.5/weather?q=" + name + "&appid=e34ed2404aade8ba726f190aa26da0c8").get();
+            result = data.execute("http://api.openweathermap.org/data/2.5/weather?q=" + name + "&APPID=e34ed2404aade8ba726f190aa26da0c8").get();
 //            data.execute("https://api.darksky.net/forecast/7d7c4d51abd38384fd51a174d0771a5d/52.1332,-106.6700").get();
 
             /* create JSON object from given string */
@@ -230,6 +299,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             /* start new activity */
             startActivity(weatherDisplay);
         }
+        /* in case an error occurs */
         catch (InterruptedException e)
         {
             e.printStackTrace();
