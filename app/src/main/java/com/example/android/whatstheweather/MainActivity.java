@@ -197,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 JSONObject jsonObject = new JSONObject(userLocationInfo);
                 String userInfo = this.formatWeatherInfo(jsonObject);
                 if (userInfo.isEmpty()) {
-                    ((TextView) findViewById(R.id.userInfo)).setText("fucked up");
+                    ((TextView) findViewById(R.id.userInfo)).setText("");
                 } else {
                     ((TextView) findViewById(R.id.userInfo)).setText(this.formatWeatherInfo(jsonObject));
                 }
