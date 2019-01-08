@@ -162,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             int humidity = jsonObjectMain.getInt("humidity");
 
             /* build string containing all the information to be shown on screen */
-            weatherInfo = jsonPartWeather.getString("main") + ": " + jsonPartWeather.getString("description")
+            weatherInfo = "Loc name: " + rawData.getString("name") + "\n" + jsonPartWeather.getString("main") + ": " + jsonPartWeather.getString("description")
                     + "\nCurr temp: " + String.valueOf(Math.round(temp - 273.15)) + "C" +  "\nMin temp: " +
                     String.valueOf(Math.round(temp_min - 273.15)) + "C"
                     + "\nMax temp: " + String.valueOf(Math.round(temp_max - 273.15)) + "C" + "\nHumidity: " + humidity + "%"
