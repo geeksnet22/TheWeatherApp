@@ -15,7 +15,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -135,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
-    public String formatWeatherInfo(JSONObject rawData)
+    public WeatherInfo formatWeatherInfo(JSONObject rawData)
     {
         String weatherInfo = "";
         try
@@ -157,23 +156,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             String mainInfo = rawData.getString("main");
             JSONObject jsonObjectMain = new JSONObject(mainInfo);
             int temp = jsonObjectMain.getInt("temp");
-            int temp_min = jsonObjectMain.getInt("temp_min");
-            int temp_max = jsonObjectMain.getInt("temp_max");
             int humidity = jsonObjectMain.getInt("humidity");
 
             /* build string containing all the information to be shown on screen */
-            weatherInfo = "Loc name: " + rawData.getString("name") + "\n" + jsonPartWeather.getString("main") + ": " + jsonPartWeather.getString("description")
-                    + "\nCurr temp: " + String.valueOf(Math.round(temp - 273.15)) + "C" +  "\nMin temp: " +
-                    String.valueOf(Math.round(temp_min - 273.15)) + "C"
-                    + "\nMax temp: " + String.valueOf(Math.round(temp_max - 273.15)) + "C" + "\nHumidity: " + humidity + "%"
+            weatherInfo = rawData.getString("name") + "\n" + jsonPartWeather.getString("description")
+                    + "\nCurr temp: " + String.valueOf(Math.round(temp - 273.15)) + "C" + "\nHumidity: " + humidity + "%"
                     + "\nLongitude: " + lon + "\nLatitude: " + lat;
-            return weatherInfo;
+            return new WeatherInfo(jsonPartWeather.getString("main"), weatherInfo);
         }
         catch (JSONException e)
         {
             e.printStackTrace();
         }
-        return "";
+        return new WeatherInfo("", "");
     }
 
     /* This function is run when the  app first starts */
@@ -195,11 +190,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             String userLocationInfo = getWeatherInfo(latitude, longitude);
             try {
                 JSONObject jsonObject = new JSONObject(userLocationInfo);
-                String userInfo = this.formatWeatherInfo(jsonObject);
+                String userInfo = this.formatWeatherInfo(jsonObject).getWeatherInfo();
                 if (userInfo.isEmpty()) {
                     ((TextView) findViewById(R.id.userInfo)).setText("");
                 } else {
-                    ((TextView) findViewById(R.id.userInfo)).setText(this.formatWeatherInfo(jsonObject));
+                    ((TextView) findViewById(R.id.userInfo)).setText(this.formatWeatherInfo(jsonObject).getWeatherInfo());
                 }
             }
             catch (JSONException e)
@@ -262,40 +257,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             /* create JSON object from given string */
             JSONObject jsonObject = new JSONObject(result);
 
-            /* location information */
-            String coordInfo = jsonObject.getString("coord");
-            /* JSON object representing location coordinates */
-            JSONObject jsonObjectCoord = new JSONObject(coordInfo);
-            int lon = jsonObjectCoord.getInt("lon");
-            int lat = jsonObjectCoord.getInt("lat");
-
-            /* get main weather information */
-            String weatherInfo = jsonObject.getString("weather");
-            /* JSON array containing various aspects of weather */
-            JSONArray jsonArrayWeather = new JSONArray(weatherInfo);
-            JSONObject jsonPartWeather = jsonArrayWeather.getJSONObject(0);
-
-            /* get information about other weather conditions */
-            String mainInfo = jsonObject.getString("main");
-            JSONObject jsonObjectMain = new JSONObject(mainInfo);
-            int temp = jsonObjectMain.getInt("temp");
-            int temp_min = jsonObjectMain.getInt("temp_min");
-            int temp_max = jsonObjectMain.getInt("temp_max");
-            int humidity = jsonObjectMain.getInt("humidity");
-
-            /* build string containing all the information to be shown on screen */
-            weatherInfo = jsonPartWeather.getString("main") + ": " + jsonPartWeather.getString("description")
-                    + "\nCurr temp: " + String.valueOf(Math.round(temp - 273.15)) + "C" +  "\nMin temp: " +
-                    String.valueOf(Math.round(temp_min - 273.15)) + "C"
-                    + "\nMax temp: " + String.valueOf(Math.round(temp_max - 273.15)) + "C" + "\nHumidity: " + humidity + "%"
-                    + "\nLongitude: " + lon + "\nLatitude: " + lat;
+            WeatherInfo weatherInfo = this.formatWeatherInfo(jsonObject);
 
             /* create an intent class for switching to a new activity */
             Intent weatherDisplay = new Intent(this, DisplayMessageActivity.class);
             /* pass string containing weather information to the new activity */
-            weatherDisplay.putExtra("weatherInfo", weatherInfo);
+            weatherDisplay.putExtra("weatherInfo", weatherInfo.getWeatherInfo());
             /* pass string representing the type of weather to the new activity */
-            weatherDisplay.putExtra("weatherType", jsonPartWeather.getString("main"));
+            weatherDisplay.putExtra("weatherType", weatherInfo.getWeatherType());
             /* start new activity */
             startActivity(weatherDisplay);
         }
