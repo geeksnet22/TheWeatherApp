@@ -5,17 +5,21 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.TextView;
 import android.widget.VideoView;
 
 public class DisplayMessageActivity extends AppCompatActivity {
 
+    /* used to connect to videos stored in raw folder */
+    private Uri uri;
+    /* video view in this activity */
+    private VideoView videoView = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_message);
-        VideoView videoView = findViewById(R.id.videoView);
+        videoView = findViewById(R.id.videoView);
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
@@ -25,9 +29,12 @@ public class DisplayMessageActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String weatherType = intent.getStringExtra("weatherType");
-        Uri uri = null;
+        uri = null;
         switch (weatherType)
         {
+            case "Snow":
+                uri = Uri.parse("android.resource://"+getPackageName()+"/" + R.raw.snowflakes);
+                break;
             case "Rain":
                 uri = Uri.parse("android.resource://"+getPackageName()+"/" + R.raw.raindrops);
                 break;
@@ -62,5 +69,16 @@ public class DisplayMessageActivity extends AppCompatActivity {
         String message = intent.getStringExtra("weatherInfo");
         TextView textView = findViewById(R.id.display);
         textView.setText(message);
+    }
+
+    /* This function is run when the app is resumed */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (uri != null)
+        {
+            videoView.setVideoURI(uri);
+            videoView.start();
+        }
     }
 }

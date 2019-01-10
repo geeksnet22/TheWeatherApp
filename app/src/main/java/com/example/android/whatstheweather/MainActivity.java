@@ -134,6 +134,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         }
     }
 
+    /**
+     * Take JSON object containing raw weather data and return formatted weather information
+     * @param rawData JSON object containig war weather data
+     * @return Formatted weather information
+     */
     public WeatherInfo formatWeatherInfo(JSONObject rawData)
     {
         String weatherInfo = "";
@@ -158,10 +163,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             int temp = jsonObjectMain.getInt("temp");
             int humidity = jsonObjectMain.getInt("humidity");
 
+            String wind = rawData.getString("wind");
+            JSONObject jsonObjectWind = new JSONObject(wind);
+            double windSpeed = jsonObjectWind.getDouble("speed");
+
             /* build string containing all the information to be shown on screen */
             weatherInfo = rawData.getString("name") + "\n" + jsonPartWeather.getString("description")
-                    + "\nCurr temp: " + String.valueOf(Math.round(temp - 273.15)) + "C" + "\nHumidity: " + humidity + "%"
-                    + "\nLongitude: " + lon + "\nLatitude: " + lat;
+                    + "\nCurr temp: " + String.valueOf(Math.round(temp - 273.15)) + "C" + "\nHumidity: "
+                    + humidity + "%\n" + "Wind: " + windSpeed + "kph\n" + "Longitude: " + lon + "\nLatitude: " + lat;
             return new WeatherInfo(jsonPartWeather.getString("main"), weatherInfo);
         }
         catch (JSONException e)
@@ -171,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         return new WeatherInfo("", "");
     }
 
-    /* This function is run when the  app first starts */
+    /* This function is run when the app first starts */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
