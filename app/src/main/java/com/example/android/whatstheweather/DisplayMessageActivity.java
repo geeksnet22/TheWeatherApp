@@ -29,9 +29,20 @@ public class DisplayMessageActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String weatherType = intent.getStringExtra("weatherType");
-        uri = null;
-        switch (weatherType)
+        uri = this.getUriGivenWeatherType(weatherType);
+        if (uri != null)
         {
+            videoView.setVideoURI(uri);
+            videoView.start();
+        }
+        String message = intent.getStringExtra("weatherInfo");
+        TextView textView = findViewById(R.id.display);
+        textView.setText(message);
+    }
+
+
+    private Uri getUriGivenWeatherType(String weatherType) {
+        switch (weatherType) {
             case "Snow":
                 uri = Uri.parse("android.resource://"+getPackageName()+"/" + R.raw.snowflakes);
                 break;
@@ -60,15 +71,10 @@ public class DisplayMessageActivity extends AppCompatActivity {
             case "Thunderstorm":
                 uri = Uri.parse("android.resource://"+getPackageName()+"/" + R.raw.thunderclouds);
                 break;
+            default:
+                uri = null;
         }
-        if (uri != null)
-        {
-            videoView.setVideoURI(uri);
-            videoView.start();
-        }
-        String message = intent.getStringExtra("weatherInfo");
-        TextView textView = findViewById(R.id.display);
-        textView.setText(message);
+        return uri;
     }
 
     /* This function is run when the app is resumed */
@@ -82,3 +88,4 @@ public class DisplayMessageActivity extends AppCompatActivity {
         }
     }
 }
+
