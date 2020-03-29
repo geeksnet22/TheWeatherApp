@@ -5,7 +5,7 @@ android {
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.example.android.whatstheweather"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -29,6 +29,11 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
+
+    implementation 'tk.plogitech:darksky-forecast-api:2.0.2'
+
+//    implementation 'com.googlecode.json-simple:json-simple:1.1'
+
 }
 
 apply plugin: 'com.google.gms.google-services'
