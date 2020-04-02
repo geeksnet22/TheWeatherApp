@@ -16,7 +16,6 @@
         <activity android:name=".activities.UserLocationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -27,6 +26,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.UserLocationActivity"/>
         </activity>
+        <activity
+            android:name=".activities.SearchActivity"
+            android:parentActivityName=".activities.UserLocationActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.UserLocationActivity"/>
+        </activity>
+
     </application>
 
 </manifest>

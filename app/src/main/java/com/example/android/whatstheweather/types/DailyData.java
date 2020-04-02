@@ -1,19 +1,12 @@
 package com.example.android.whatstheweather.types;
 
+import java.util.List;
+
 public class DailyData {
 
-    public String day;
+    List<DailyDataFormat> dailyDataFormatList;
 
-    public String icon;
-
-    public double minTemp;
-
-    public double maxTemp;
-
-    public DailyData(String day, String icon, double minTemp, double maxTemp) {
-        this.day = day;
-        this.icon = icon;
-        this.minTemp = minTemp;
-        this.maxTemp = maxTemp;
+    public DailyData(List<DailyDataFormat> dailyDataFormatList) {
+        this.dailyDataFormatList = dailyDataFormatList;
     }
 }
