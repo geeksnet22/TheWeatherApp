@@ -5,15 +5,34 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activities.UserLocationActivity"
-    android:background="@drawable/unsplash">
+    android:background="@drawable/unsplash"
+    android:orientation="vertical">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/userLocationToolbar"
+    <include layout="@layout/toolbar_layout"/>
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-
+        android:layout_height="wrap_content"
+        android:layout_below="@id/userLocationToolbar">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <include layout="@layout/current_info_layout"/>
+            <HorizontalScrollView
+                android:id="@+id/hourlyScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp">
+                <include layout="@layout/hourly_info_layout"/>
+            </HorizontalScrollView>
+            <HorizontalScrollView
+                android:id="@+id/dailyScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp">
+                <include layout="@layout/daily_info_layout"/>
+            </HorizontalScrollView>
+        </LinearLayout>
+    </ScrollView>
 </RelativeLayout>

@@ -1,0 +1,54 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:gravity="center"
+    android:layout_gravity="left"
+    android:orientation="vertical"
+    android:layout_marginTop="10dp"
+    android:id="@+id/dailyInfoLayout">
+    <TextView
+        android:id="@+id/dailyTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="current time"
+        android:textSize="25sp"
+        android:textColor="@color/white"/>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="5dp">
+        <ImageView
+            android:id="@+id/dailyWeatherIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/hot_sun_day" />
+        <TextView
+            android:id="@+id/dailyTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/dailyWeatherIcon"
+            android:layout_marginStart="5dp"
+            android:text="curent temp"
+            android:textSize="25sp"
+            android:textColor="@color/white"/>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/dailySummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="overcast"
+        android:textSize="25sp"
+        android:textColor="@color/white"/>
+    <TextView
+        android:id="@+id/minMaxTemp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="20 C-25 C"
+        android:textSize="25sp"
+        android:textColor="@color/white"/>
+</LinearLayout>

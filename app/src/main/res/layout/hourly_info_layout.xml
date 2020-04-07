@@ -1,0 +1,46 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:gravity="center"
+    android:layout_gravity="left"
+    android:orientation="vertical"
+    android:layout_marginTop="10dp"
+    android:id="@+id/hourlyInfoLayout">
+    <TextView
+        android:id="@+id/hourlyTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="current time"
+        android:textSize="25sp"
+        android:textColor="@color/white"/>
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="5dp">
+        <ImageView
+            android:id="@+id/hourlyWeatherIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:src="@drawable/hot_sun_day" />
+        <TextView
+            android:id="@+id/hourlyTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/hourlyWeatherIcon"
+            android:layout_marginStart="5dp"
+            android:text="curent temp"
+            android:textSize="25sp"
+            android:textColor="@color/white"/>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/hourlySummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="overcast"
+        android:textSize="25sp"
+        android:textColor="@color/white"/>
+</LinearLayout>
