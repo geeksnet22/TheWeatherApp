@@ -15,11 +15,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class JSONFileReader extends AsyncTask<Pair<Context, String>, Void, String> {
 
-    public static HashMap<String, Coordinates> locationMap;
+    public static Map<String, Coordinates> locationMap = new HashMap<>();
 
     @Override
     protected String doInBackground(Pair<Context, String>... pairs) {
@@ -41,7 +42,6 @@ public class JSONFileReader extends AsyncTask<Pair<Context, String>, Void, Strin
     }
 
     public static void readFile(Pair<Context, String> pair) throws ExecutionException, InterruptedException, JSONException {
-        locationMap = new HashMap<>();
         JSONArray locationArray = new JSONArray(new JSONFileReader().execute(pair).get());
         for (int i = 0; i < locationArray.length(); i++) {
             JSONObject locationObject = new JSONObject(locationArray.getString(i));

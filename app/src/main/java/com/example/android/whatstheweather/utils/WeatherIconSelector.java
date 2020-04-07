@@ -26,6 +26,12 @@ public class WeatherIconSelector {
             case "rain":
                 weatherIcon = R.drawable.rain_cloud_climate;
                 break;
+            case "fog":
+                weatherIcon = R.drawable.cloudy_season_cloud;
+                break;
+            case "snow":
+                weatherIcon = R.drawable.cloud_snowing_cloud_climate;
+                break;
             default:
                 weatherIcon = R.drawable.rain_cloud_climate;
         }

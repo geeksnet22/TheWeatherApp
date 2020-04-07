@@ -2,7 +2,6 @@ package com.example.android.whatstheweather.utils;
 
 import android.content.Context;
 import android.location.Geocoder;
-import android.widget.ArrayAdapter;
 
 import com.example.android.whatstheweather.types.CurrentData;
 import com.example.android.whatstheweather.types.DailyData;
@@ -15,15 +14,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 public class LocationDataProcessor {
@@ -39,12 +34,12 @@ public class LocationDataProcessor {
         jsonifiedData = new JSONObject(rawData);
 
         JSONObject currentData = new JSONObject(rawData).getJSONObject("currently");
-//        System.out.println("GSB current: " + rawData);
+
         String locationName = geocoder.getFromLocation(jsonifiedData.getDouble("latitude"),
                 jsonifiedData.getDouble("longitude"), 1).get(0).getLocality();
 
         String datetime = getCurrentDateTimeAtTimezone(jsonifiedData.getString("timezone"),
-                currentData.getLong("time"));
+                currentData.getLong("time"), "yyyy-MM-dd hh:mm:ss aa");
 
         return new CurrentData(locationName, currentData.getString("summary"),
                 currentData.getInt("temperature"), datetime, currentData.getString("icon"));
@@ -61,19 +56,12 @@ public class LocationDataProcessor {
             JSONObject hourlyInfoObject = new JSONObject(hourlyData.getString(i));
 
             String datetime = getCurrentDateTimeAtTimezone(jsonifiedData.getString("timezone"),
-                    hourlyInfoObject.getLong("time"));
-            String hours = datetime.substring(11, 13);
-            String mins = datetime.substring(14,16);
-
-            String time = "";
-            while (time.length() < 5) {
-                time = ( hours.length() < 2 ? "0" + hours : hours )
-                        + ":" + ( mins.length() < 2 ? mins + "0" : mins );
-            }
+                    hourlyInfoObject.getLong("time"), "hh:mm aa");
+            System.out.println("GSB datetime:" + datetime);
             String icon = hourlyInfoObject.getString("icon");
             int temperature = (int) hourlyInfoObject.getLong("temperature");
             String summary = hourlyInfoObject.getString("summary");
-            hourlyDataFormatList.add(new HourlyDataFormat(time, icon, temperature, summary));
+            hourlyDataFormatList.add(new HourlyDataFormat(datetime, icon, temperature, summary));
         }
         return new HourlyData(hourlyDataFormatList);
     }
@@ -97,10 +85,10 @@ public class LocationDataProcessor {
         return new DailyData(dailyDataFormatList);
     }
 
-    private static String getCurrentDateTimeAtTimezone(String timezone, long timestamp) {
+    private static String getCurrentDateTimeAtTimezone(String timezone, long timestamp, String pattern) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date(timestamp*1000));
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         sdf.setTimeZone(TimeZone.getTimeZone(timezone));
         return sdf.format(calendar.getTime());
     }

@@ -53,7 +53,7 @@ public class SearchActivity extends AppCompatActivity {
         suggestedLocations.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                locationSearch.setQuery(suggestedLocations.getItemAtPosition(position).toString(), true);
+                locationSearch.setQuery(suggestedLocations.getItemAtPosition(position).toString(), false);
             }
         });
         suggestedLocations.setAdapter(adapter);
@@ -90,7 +90,7 @@ public class SearchActivity extends AppCompatActivity {
                         rawData = ExtractData.extractData(coordinates.latitude, coordinates.longitude);
                     }
                     else {
-                        Toast.makeText(context, "Location data not available", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Location not found. Please provide more information (eg. country name).", Toast.LENGTH_SHORT).show();
                         return true;
                     }
                     Intent searchedLocationIntent = new Intent(context, SearchedLocationActivity.class);

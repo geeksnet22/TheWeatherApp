@@ -52,6 +52,9 @@ public class DataLayout {
 
     public static Button getSearchButton(final Context context, final Activity activity) {
         Button searchButton = new Button(context);
+        searchButton.setGravity(Gravity.CENTER);
+        searchButton.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
         searchButton.setText("Search location");
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,7 +105,21 @@ public class DataLayout {
             dayView.setTextColor(Color.WHITE);
             dayView.setGravity(Gravity.CENTER);
 
+            ImageView weatherIcon = new ImageView(context);
+            weatherIcon.setImageResource(WeatherIconSelector.getWeatherIcon(dailyData.dailyDataFormatList.get(i).icon));
+
+            TextView minMaxTemp = new TextView(context);
+            minMaxTemp.setLayoutParams(new LinearLayout.LayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)));
+            minMaxTemp.setTextSize(25);
+            minMaxTemp.setTextColor(Color.WHITE);
+            minMaxTemp.setGravity(Gravity.CENTER);
+            minMaxTemp.append(dailyData.dailyDataFormatList.get(i).minTemp + " C-"
+                    + dailyData.dailyDataFormatList.get(i).maxTemp + " C");
+
             dailyInfoFormatLayout.addView(dayView);
+            dailyInfoFormatLayout.addView(weatherIcon);
+            dailyInfoFormatLayout.addView(minMaxTemp);
 
             dailyInfoLayout.addView(dailyInfoFormatLayout);
         }
@@ -140,14 +157,16 @@ public class DataLayout {
                     LinearLayout.LayoutParams.WRAP_CONTENT);
             temperatureLayout.setLayoutParams(layoutParams);
             temperatureLayout.setOrientation(LinearLayout.HORIZONTAL);
+
             ImageView temperatureIcon = new ImageView(context);
-            temperatureIcon.setForegroundGravity(Gravity.CENTER);
             temperatureIcon.setImageResource(WeatherIconSelector.getWeatherIcon(hourlyData.hourlyDataFormatList.get(i).icon));
+
             TextView temperature = new TextView(context);
             temperature.append(hourlyData.hourlyDataFormatList.get(i).temperature + " C");
             temperature.setTextColor(Color.WHITE);
             temperature.setTextSize(25);
             temperature.setGravity(Gravity.CENTER);
+
             temperatureLayout.addView(temperatureIcon);
             temperatureLayout.addView(temperature);
 

@@ -1,12 +1,15 @@
 package com.example.android.whatstheweather.activities;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import androidx.appcompat.widget.Toolbar;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android.whatstheweather.R;
@@ -26,6 +29,19 @@ public class SearchedLocationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_searched);
 
+        Toolbar toolbar = findViewById(R.id.searchedLocationToolbar);
+        setSupportActionBar(toolbar);
+
+        final Context context = this;
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Intent intent = new Intent(context, UserLocationActivity.class);
+                startActivity(intent);
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, callback);
+
         Intent userlocationIntent = getIntent();
         String rawData = userlocationIntent.getStringExtra("rawData");
         try {
@@ -34,7 +50,10 @@ public class SearchedLocationActivity extends AppCompatActivity {
             DailyData dailyData = LocationDataProcessor.getDailyData();
 
             ScrollView mainView = DataLayout.getDataLayout(this, this, currentData, hourlyData, dailyData, false);
-            this.addContentView(mainView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(0, 200, 0, 0);
+            this.addContentView(mainView, layoutParams);
             mainView.draw(new Canvas());
         }
         catch (IOException | JSONException e) {

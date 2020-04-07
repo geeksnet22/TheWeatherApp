@@ -1,26 +1,21 @@
 package com.example.android.whatstheweather.activities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Canvas;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Pair;
-import android.view.View;
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
-import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.android.whatstheweather.R;
-import com.example.android.whatstheweather.types.Coordinates;
 import com.example.android.whatstheweather.types.DailyData;
 import com.example.android.whatstheweather.types.DataLayout;
 import com.example.android.whatstheweather.types.CurrentData;
@@ -33,7 +28,6 @@ import com.example.android.whatstheweather.utils.LocationServices;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class UserLocationActivity extends AppCompatActivity {
@@ -44,8 +38,13 @@ public class UserLocationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_user);
 
+        Toolbar toolbar = findViewById(R.id.userLocationToolbar);
+        setSupportActionBar(toolbar);
+
         try {
-            JSONFileReader.readFile(new Pair<Context, String>(this, "citylist.json"));
+            if (JSONFileReader.locationMap.isEmpty()){
+                JSONFileReader.readFile(new Pair<Context, String>(this, "citylist.json"));
+            }
         } catch (ExecutionException | InterruptedException | JSONException e) {
             e.printStackTrace();
         }
@@ -69,17 +68,26 @@ public class UserLocationActivity extends AppCompatActivity {
                 LocationDataProcessor.getDailyData();
 
                 ScrollView mainView = DataLayout.getDataLayout(this, this, currentData, hourlyData, dailyData, true);
-                this.addContentView(mainView, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                layoutParams.setMargins(0, 200, 0, 0);
+                this.addContentView(mainView, layoutParams);
                 mainView.draw(new Canvas());
             }
             catch ( ExecutionException | InterruptedException | JSONException | IOException e) {
                 e.printStackTrace();
-                Toast.makeText(this, "Location data not available", Toast.LENGTH_SHORT).show();
             }
         }
         else {
+            LinearLayout linearLayout = new LinearLayout(this);
+            linearLayout.setGravity(Gravity.CENTER);
             Button searchButton = DataLayout.getSearchButton(this, this);
-            this.addContentView(searchButton, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            linearLayout.addView(searchButton);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(0, 200, 0, 0);
+            this.addContentView(linearLayout, layoutParams);
+
             searchButton.draw(new Canvas());
         }
     }
