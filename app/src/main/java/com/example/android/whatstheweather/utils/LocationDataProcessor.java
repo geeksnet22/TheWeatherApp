@@ -42,7 +42,8 @@ public class LocationDataProcessor {
                 currentData.getLong("time"), "yyyy-MM-dd hh:mm:ss aa");
 
         return new CurrentData(locationName, currentData.getString("summary"),
-                currentData.getInt("temperature"), datetime, currentData.getString("icon"));
+                currentData.getInt("temperature") + " C", datetime,
+                WeatherIconSelector.getWeatherIcon(currentData.getString("icon")));
     }
 
 
@@ -58,8 +59,8 @@ public class LocationDataProcessor {
             String datetime = getCurrentDateTimeAtTimezone(jsonifiedData.getString("timezone"),
                     hourlyInfoObject.getLong("time"), "hh:mm aa");
             System.out.println("GSB datetime:" + datetime);
-            String icon = hourlyInfoObject.getString("icon");
-            int temperature = (int) hourlyInfoObject.getLong("temperature");
+            int icon = WeatherIconSelector.getWeatherIcon(hourlyInfoObject.getString("icon"));
+            String temperature = hourlyInfoObject.getInt("temperature") + " C";
             String summary = hourlyInfoObject.getString("summary");
             hourlyDataFormatList.add(new HourlyDataFormat(datetime, icon, temperature, summary));
         }
@@ -78,8 +79,8 @@ public class LocationDataProcessor {
             JSONObject dailyInfoObject = new JSONObject(dailyData.getString(i));
 
             dailyDataFormatList.add(new DailyDataFormat(getDayFromTimestamp(jsonifiedData.getString("timezone"),
-                    dailyInfoObject.getLong("time")), dailyInfoObject.getString("icon"),
-                    dailyInfoObject.getInt("temperatureMin"), dailyInfoObject.getInt("temperatureMax")));
+                    dailyInfoObject.getLong("time")), WeatherIconSelector.getWeatherIcon(dailyInfoObject.getString("icon")),
+                    dailyInfoObject.getInt("temperatureMin") + " C", dailyInfoObject.getInt("temperatureMax") + " C"));
         }
 
         return new DailyData(dailyDataFormatList);

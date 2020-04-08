@@ -3,11 +3,11 @@ package com.example.android.whatstheweather.types;
 public class DailyDataFormat {
 
     public String day;
-    public String icon;
-    public int minTemp;
-    public int maxTemp;
+    public int icon;
+    public String minTemp;
+    public String maxTemp;
 
-    public DailyDataFormat(String day, String icon, int minTemp, int maxTemp) {
+    public DailyDataFormat(String day, int icon, String minTemp, String maxTemp) {
         this.day = day;
         this.icon = icon;
         this.minTemp = minTemp;

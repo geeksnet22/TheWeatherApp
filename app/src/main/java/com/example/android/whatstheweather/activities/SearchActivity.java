@@ -4,16 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -21,16 +17,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.android.whatstheweather.R;
 import com.example.android.whatstheweather.types.Coordinates;
-import com.example.android.whatstheweather.types.DataLayout;
 import com.example.android.whatstheweather.utils.ExtractData;
 import com.example.android.whatstheweather.utils.JSONFileReader;
-import com.example.android.whatstheweather.utils.LocationDataProcessor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 public class SearchActivity extends AppCompatActivity {
