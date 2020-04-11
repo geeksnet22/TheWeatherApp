@@ -6,8 +6,8 @@
     tools:context=".activities.SearchedLocationActivity"
     android:background="@drawable/unsplash">
 
-    <include layout="@layout/toolbar_layout"
-        android:id="@+id/searchedLocationToolbar"/>
+
+    <include layout="@layout/toolbar_layout"/>
     <include layout="@layout/overall_data_layout"/>
 
 </RelativeLayout>

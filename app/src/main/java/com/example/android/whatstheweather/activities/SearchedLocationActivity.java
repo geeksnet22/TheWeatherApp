@@ -11,7 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.android.whatstheweather.R;
 import com.example.android.whatstheweather.types.CurrentData;
 import com.example.android.whatstheweather.types.DailyData;
-import com.example.android.whatstheweather.utils.DataLayout;
+import com.example.android.whatstheweather.utils.DataLayoutSetter;
 import com.example.android.whatstheweather.types.HourlyData;
 import com.example.android.whatstheweather.utils.LocationDataProcessor;
 
@@ -25,14 +25,14 @@ public class SearchedLocationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_searched);
 
-        Toolbar toolbar = findViewById(R.id.searchedLocationToolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         final Context context = this;
         OnBackPressedCallback callback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                Intent intent = new Intent(context, UserLocationActivity.class);
+                Intent intent = new Intent(context, MainActivity.class);
                 startActivity(intent);
             }
         };
@@ -45,7 +45,7 @@ public class SearchedLocationActivity extends AppCompatActivity {
             HourlyData hourlyData = LocationDataProcessor.getHourlyData();
             DailyData dailyData = LocationDataProcessor.getDailyData();
 
-            DataLayout.setDataLayout(this, this, currentData, hourlyData, dailyData);
+            DataLayoutSetter.setDataLayout(this, this, currentData, hourlyData, dailyData);
         }
         catch (IOException | JSONException e) {
             e.printStackTrace();

@@ -12,7 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="current time"
         android:textSize="25sp"
         android:textColor="@color/white"/>
     <ImageView
@@ -20,14 +19,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:foregroundGravity="center"
-        android:layout_marginTop="5dp"
-        android:src="@drawable/hot_sun_day"/>
+        android:layout_marginTop="5dp"/>
     <TextView
         android:id="@+id/minMaxTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:text="20 C-25 C"
         android:textSize="25sp"
         android:textColor="@color/white"/>
 </LinearLayout>

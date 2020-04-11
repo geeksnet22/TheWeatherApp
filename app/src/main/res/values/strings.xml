@@ -2,5 +2,7 @@
     <string name="app_name">Whats The Weather</string>
     <string name="hourly_heading">Hourly</string>
     <string name="daily_heading">Daily</string>
-    <string name="min_max_temp">%1$s-%2$s</string>
+    <string name="min_max_temp">%1$s - %2$s</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>
