@@ -3,6 +3,8 @@ package com.example.android.whatstheweather.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.TextView;
+
 import androidx.appcompat.widget.Toolbar;
 
 import androidx.activity.OnBackPressedCallback;
@@ -28,22 +30,15 @@ public class SearchedLocationActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final Context context = this;
-        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                Intent intent = new Intent(context, MainActivity.class);
-                startActivity(intent);
-            }
-        };
-        getOnBackPressedDispatcher().addCallback(this, callback);
-
         Intent userlocationIntent = getIntent();
         String rawData = userlocationIntent.getStringExtra("rawData");
         try {
             CurrentData currentData = LocationDataProcessor.getCurrentData(rawData, this);
             HourlyData hourlyData = LocationDataProcessor.getHourlyData();
             DailyData dailyData = LocationDataProcessor.getDailyData();
+
+            ((TextView) findViewById(R.id.hourlyHeading)).setText("Hourly");
+            ((TextView) findViewById(R.id.dailyHeading)).setText("Daily");
 
             DataLayoutSetter.setDataLayout(this, this, currentData, hourlyData, dailyData);
         }

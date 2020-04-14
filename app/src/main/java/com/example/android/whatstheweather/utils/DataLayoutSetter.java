@@ -21,7 +21,6 @@ import java.util.List;
 public class DataLayoutSetter {
 
     public static void setDataLayout(Activity activity, Context context, CurrentData currentData, HourlyData hourlyData, DailyData dailyData) {
-        System.out.println("GSB temperature: " + currentData.temperature);
         setupCurrentInfoLayout(activity, currentData);
         setupHourlyInfoLayout(activity, context, hourlyData);
         setupDailyInfoLayout(activity, context, dailyData);

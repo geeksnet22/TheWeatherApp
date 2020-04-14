@@ -28,9 +28,7 @@ public class LocationDataProcessor {
     private static JSONObject jsonifiedData;
 
     public static CurrentData getCurrentData(String rawData, Context context) throws JSONException, IOException {
-
         geocoder = new Geocoder(context);
-
         jsonifiedData = new JSONObject(rawData);
 
         JSONObject currentData = new JSONObject(rawData).getJSONObject("currently");
@@ -48,9 +46,7 @@ public class LocationDataProcessor {
 
 
     public static HourlyData getHourlyData() throws JSONException {
-
         JSONArray hourlyData = new JSONArray(jsonifiedData.getJSONObject("hourly").getString("data"));
-
         List<HourlyDataFormat> hourlyDataFormatList = new ArrayList<>();
 
         for (int i = 0; i < hourlyData.length(); i++) {
@@ -58,7 +54,6 @@ public class LocationDataProcessor {
 
             String datetime = getCurrentDateTimeAtTimezone(jsonifiedData.getString("timezone"),
                     hourlyInfoObject.getLong("time"), "hh:mm aa");
-            System.out.println("GSB datetime:" + datetime);
             int icon = WeatherIconSelector.getWeatherIcon(hourlyInfoObject.getString("icon"));
             String temperature = hourlyInfoObject.getInt("temperature") + " C";
             String summary = hourlyInfoObject.getString("summary");
@@ -68,16 +63,11 @@ public class LocationDataProcessor {
     }
 
     public static DailyData getDailyData() throws JSONException {
-
-        System.out.println("GSB daily data: " + jsonifiedData.getJSONObject("daily").getString("data"));
-
         JSONArray dailyData = new JSONArray(jsonifiedData.getJSONObject("daily").getString("data"));
-
         List<DailyDataFormat> dailyDataFormatList = new ArrayList<>();
 
         for (int i = 0; i < dailyData.length(); i++) {
             JSONObject dailyInfoObject = new JSONObject(dailyData.getString(i));
-
             dailyDataFormatList.add(new DailyDataFormat(getDayFromTimestamp(jsonifiedData.getString("timezone"),
                     dailyInfoObject.getLong("time")), WeatherIconSelector.getWeatherIcon(dailyInfoObject.getString("icon")),
                     dailyInfoObject.getInt("temperatureMin") + " C", dailyInfoObject.getInt("temperatureMax") + " C"));

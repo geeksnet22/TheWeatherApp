@@ -29,7 +29,7 @@ public class LocationServices {
         if (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             return this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }
-        return null;
+        return this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 
 

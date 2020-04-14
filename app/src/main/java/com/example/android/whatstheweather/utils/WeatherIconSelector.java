@@ -5,7 +5,6 @@ import com.example.android.whatstheweather.R;
 public class WeatherIconSelector {
 
     public static int getWeatherIcon(String iconDesc) {
-        System.out.println("GSB weather: " + iconDesc);
         int weatherIcon;
         switch (iconDesc) {
             case "clear-day":
