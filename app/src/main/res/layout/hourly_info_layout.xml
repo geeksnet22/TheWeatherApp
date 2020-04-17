@@ -5,7 +5,7 @@
     android:gravity="center"
     android:layout_gravity="left"
     android:orientation="vertical"
-    android:id="@+id/hourlyInfoLayout"
+    android:scrollbars="horizontal"
     android:paddingEnd="25dp">
     <TextView
         android:id="@+id/hourlyTime"

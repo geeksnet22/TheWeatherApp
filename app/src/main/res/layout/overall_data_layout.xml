@@ -16,11 +16,7 @@
             android:textSize="25sp"
             android:textColor="@color/white"
             android:layout_marginTop="10dp"/>
-        <HorizontalScrollView
-            android:id="@+id/hourlyScrollView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"/>
+        <include layout="@layout/hourly_view"/>
         <TextView
             android:id="@+id/dailyHeading"
             android:layout_width="wrap_content"

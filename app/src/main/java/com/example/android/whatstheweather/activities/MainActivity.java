@@ -29,12 +29,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.whatstheweather.R;
 import com.example.android.whatstheweather.types.Coordinates;
 import com.example.android.whatstheweather.types.CurrentData;
 import com.example.android.whatstheweather.types.DailyData;
 import com.example.android.whatstheweather.types.HourlyData;
+import com.example.android.whatstheweather.types.HourlyDataFormat;
 import com.example.android.whatstheweather.utils.DataLayoutSetter;
 import com.example.android.whatstheweather.utils.ExtractData;
 import com.example.android.whatstheweather.utils.JSONFileReader;
@@ -76,13 +79,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
          geocoder = new Geocoder(this);
 
-        try {
-            if (JSONFileReader.locationMap.isEmpty()){
-                JSONFileReader.readFile(new Pair<Context, String>(this, "citylist.json"));
-            }
-        } catch (ExecutionException | InterruptedException | JSONException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (JSONFileReader.locationMap.isEmpty()){
+//                JSONFileReader.readFile(new Pair<Context, String>(this, "citylist.json"));
+//            }
+//        } catch (ExecutionException | InterruptedException | JSONException e) {
+//            e.printStackTrace();
+//        }
 
         drawer = findViewById(R.id.drawer_layout);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -143,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 ((TextView) findViewById(R.id.dailyHeading)).setText("Daily");
 
                 DataLayoutSetter.setDataLayout(this, this, currentData, hourlyData, dailyData);
+
             }
             catch ( ExecutionException | InterruptedException | JSONException | IOException e) {
                 e.printStackTrace();
