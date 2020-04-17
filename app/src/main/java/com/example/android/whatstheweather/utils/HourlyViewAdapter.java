@@ -1,4 +1,4 @@
-package com.example.android.whatstheweather.activities;
+package com.example.android.whatstheweather.utils;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -17,14 +17,14 @@ import java.util.List;
 
 public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.ViewHolder> {
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView time;
         private ImageView weatherIcon;
         private TextView temperature;
         private TextView summary;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             time = itemView.findViewById(R.id.hourlyTime);
             weatherIcon = itemView.findViewById(R.id.hourlyWeatherIcon);
@@ -35,15 +35,14 @@ public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.Vi
 
     private List<HourlyDataFormat> hourlyViews;
 
-    public HourlyViewAdapter(List<HourlyDataFormat> hourlyViews) {
+    HourlyViewAdapter(List<HourlyDataFormat> hourlyViews) {
         this.hourlyViews = hourlyViews;
     }
 
     @NonNull
     @Override
     public HourlyViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View hourlyInfoView = inflater.inflate(R.layout.hourly_info_layout, parent, false);
         return new ViewHolder(hourlyInfoView);
     }
@@ -52,17 +51,10 @@ public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.Vi
     public void onBindViewHolder(@NonNull HourlyViewAdapter.ViewHolder holder, int position) {
         HourlyDataFormat hourlyData = hourlyViews.get(position);
 
-        TextView timeView = holder.time;
-        timeView.setText(hourlyData.time);
-
-        ImageView weatherIcon = holder.weatherIcon;
-        weatherIcon.setImageResource(hourlyData.icon);
-
-        TextView temperatureView = holder.temperature;
-        temperatureView.setText(hourlyData.temperature);
-
-        TextView summaryView = holder.summary;
-        summaryView.setText(hourlyData.summary);
+        holder.time.setText(hourlyData.time);
+        holder.weatherIcon.setImageResource(hourlyData.icon);
+        holder.temperature.setText(hourlyData.temperature);
+        holder.summary.setText(hourlyData.summary);
     }
 
     @Override

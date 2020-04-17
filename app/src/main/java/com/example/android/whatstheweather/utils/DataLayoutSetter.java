@@ -3,7 +3,6 @@ package com.example.android.whatstheweather.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -13,7 +12,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.whatstheweather.R;
-import com.example.android.whatstheweather.activities.HourlyViewAdapter;
 import com.example.android.whatstheweather.types.CurrentData;
 import com.example.android.whatstheweather.types.DailyData;
 import com.example.android.whatstheweather.types.DailyDataFormat;
@@ -31,7 +29,10 @@ public class DataLayoutSetter {
         hourlyView.setAdapter(hourlyViewAdapter);
         hourlyView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
 
-        setupDailyInfoLayout(activity, context, dailyData);
+        RecyclerView dailyView = activity.findViewById(R.id.dailyView);
+        DailyViewAdapter dailyViewAdapter = new DailyViewAdapter(dailyData.dailyDataFormatList);
+        dailyView.setAdapter(dailyViewAdapter);
+        dailyView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
     }
 
     private static void setupCurrentInfoLayout(Activity activity, CurrentData currentData) {
@@ -40,20 +41,5 @@ public class DataLayoutSetter {
         ((ImageView) activity.findViewById(R.id.currentWeatherIcon)).setImageResource(currentData.icon);
         ((TextView) activity.findViewById(R.id.currentTemp)).setText(currentData.temperature);
         ((TextView) activity.findViewById(R.id.currentSummary)).setText(currentData.summary);
-    }
-
-    private static void setupDailyInfoLayout(Activity activity, Context context, DailyData dailyData) {
-        HorizontalScrollView dailyScrollView = activity.findViewById(R.id.dailyScrollView);
-        LinearLayout dailyDataLayout = new LinearLayout(context);
-        List<DailyDataFormat> dailyDataList = dailyData.dailyDataFormatList;
-        for (int i = 0; i < dailyDataList.size(); i++) {
-            View view = activity.getLayoutInflater().inflate(R.layout.daily_info_layout, null);
-            ((TextView) view.findViewById(R.id.dailyTime)).setText(dailyDataList.get(i).day);
-            ((ImageView) view.findViewById(R.id.dailyWeatherIcon)).setImageResource(dailyDataList.get(i).icon);
-            ((TextView) view.findViewById(R.id.minMaxTemp)).setText(String.format(activity.getResources().getString
-                    (R.string.min_max_temp), dailyDataList.get(i).minTemp, dailyDataList.get(i).maxTemp));
-            dailyDataLayout.addView(view);
-        }
-        dailyScrollView.addView(dailyDataLayout);
     }
 }

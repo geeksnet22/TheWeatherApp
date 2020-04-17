@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ListView favLocationsView;
 
+    private SearchView searchView;
+
     private boolean addToFavorites;
 
     @Override
@@ -79,13 +81,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
          geocoder = new Geocoder(this);
 
-//        try {
-//            if (JSONFileReader.locationMap.isEmpty()){
-//                JSONFileReader.readFile(new Pair<Context, String>(this, "citylist.json"));
-//            }
-//        } catch (ExecutionException | InterruptedException | JSONException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            if (JSONFileReader.locationMap.isEmpty()){
+                JSONFileReader.readFile(new Pair<Context, String>(this, "citylist.json"));
+            }
+        } catch (ExecutionException | InterruptedException | JSONException e) {
+            e.printStackTrace();
+        }
 
         drawer = findViewById(R.id.drawer_layout);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -165,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.search_menu, menu);
         MenuItem searchViewItem = menu.findItem(R.id.app_bar_search);
-        final SearchView searchView = (SearchView) searchViewItem.getActionView();
+        searchView = (SearchView) searchViewItem.getActionView();
         searchView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,7 +223,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchView.setQuery("", false);
                 try {
                     String rawData = getRawDataFromLocationName(query);
                     if (rawData == null) {
@@ -234,6 +235,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         addToFavorites = false;
                         favLocationsList.add(query);
                         favLocationsAdaptor.notifyDataSetChanged();
+                        searchView.setQuery("", false);
+                        searchView.setIconified(true);
                         Toast.makeText(context, "Location added to favorites.", Toast.LENGTH_SHORT).show();
                         drawer.openDrawer(GravityCompat.START);
                         return false;
@@ -269,6 +272,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return false;
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (searchView != null) {
+            searchView.setQuery("", false);
+            searchView.setIconified(true);
+        }
     }
 
     private String getRawDataFromLocationName(String locationname) throws ExecutionException, InterruptedException, IOException {
