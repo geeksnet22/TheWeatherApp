@@ -7,7 +7,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,11 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -29,15 +25,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.whatstheweather.R;
 import com.example.android.whatstheweather.types.Coordinates;
-import com.example.android.whatstheweather.types.CurrentData;
-import com.example.android.whatstheweather.types.DailyData;
-import com.example.android.whatstheweather.types.HourlyData;
-import com.example.android.whatstheweather.types.HourlyDataFormat;
+import com.example.android.whatstheweather.types.OverallData;
 import com.example.android.whatstheweather.utils.DataLayoutSetter;
 import com.example.android.whatstheweather.utils.ExtractData;
 import com.example.android.whatstheweather.utils.JSONFileReader;
@@ -132,31 +123,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         /* get user location */
         Location userLocation = locationServices.getLocation(this, this);
 
-
         /* if permission to access user's location is granted */
         if (userLocation != null)
         {
             try {
                 String rawData = ExtractData.extractData(userLocation.getLatitude(), userLocation.getLongitude());
 
-                CurrentData currentData = LocationDataProcessor.getCurrentData(rawData, this);
-                HourlyData hourlyData = LocationDataProcessor.getHourlyData();
-                DailyData dailyData = LocationDataProcessor.getDailyData();
+                LocationDataProcessor locationDataProcessor = new LocationDataProcessor(new Pair<Context, String>(context, rawData));
 
-                toolbar.setTitle(currentData.locationName);
-                ((TextView) findViewById(R.id.hourlyHeading)).setText("Hourly");
-                ((TextView) findViewById(R.id.dailyHeading)).setText("Daily");
+                OverallData data = locationDataProcessor.fetchRawWeatherData(new Pair<Context, String>(this, rawData));
 
-                DataLayoutSetter.setDataLayout(this, this, currentData, hourlyData, dailyData);
+                toolbar.setTitle(data.currentData.locationName);
 
+                DataLayoutSetter.setDataLayout(this, this, data.currentData, data.hourlyData,
+                        data.dailyData, data.detailsData);
             }
-            catch ( ExecutionException | InterruptedException | JSONException | IOException e) {
+            catch ( ExecutionException | InterruptedException | JSONException e) {
                 e.printStackTrace();
                 Toast.makeText(this, "Internet not available.", Toast.LENGTH_SHORT).show();
             }
         }
         else {
             toolbar.setTitle("Home");
+            findViewById(R.id.mainScroll).setVisibility(View.GONE);
+
+            Toast.makeText(context, "Not able to retrive weather information at this moment. Make " +
+                    "sure location access is granted and try refreshing the page by pulling down.", Toast.LENGTH_LONG).show();
+
         }
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

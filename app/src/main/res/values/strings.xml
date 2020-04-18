@@ -2,6 +2,7 @@
     <string name="app_name">Whats The Weather</string>
     <string name="hourly_heading">Hourly</string>
     <string name="daily_heading">Daily</string>
+    <string name="details_heading">Details</string>
     <string name="min_max_temp">%1$s - %2$s</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -9,4 +10,8 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+    <string name="uv_index">UV index</string>
+    <string name="sunrise">Sunrise</string>
+    <string name="sunset">Sunset</string>
+    <string name="humidity">Humidity</string>
 </resources>

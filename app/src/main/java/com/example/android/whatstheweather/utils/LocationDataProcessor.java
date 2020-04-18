@@ -2,12 +2,16 @@ package com.example.android.whatstheweather.utils;
 
 import android.content.Context;
 import android.location.Geocoder;
+import android.os.AsyncTask;
+import android.util.Pair;
 
 import com.example.android.whatstheweather.types.CurrentData;
 import com.example.android.whatstheweather.types.DailyData;
 import com.example.android.whatstheweather.types.DailyDataFormat;
+import com.example.android.whatstheweather.types.DetailsData;
 import com.example.android.whatstheweather.types.HourlyData;
 import com.example.android.whatstheweather.types.HourlyDataFormat;
+import com.example.android.whatstheweather.types.OverallData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,18 +24,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.concurrent.ExecutionException;
 
-public class LocationDataProcessor {
+public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void, OverallData> {
 
-    private static Geocoder geocoder;
+    private Geocoder geocoder;
+    private JSONObject jsonifiedData;
 
-    private static JSONObject jsonifiedData;
+    private Pair<Context, String> pair;
 
-    public static CurrentData getCurrentData(String rawData, Context context) throws JSONException, IOException {
-        geocoder = new Geocoder(context);
-        jsonifiedData = new JSONObject(rawData);
+    public LocationDataProcessor(Pair<Context, String> pair) throws JSONException {
+        this.pair = pair;
+        this.geocoder = new Geocoder(pair.first);
+        this.jsonifiedData = new JSONObject(pair.second);
+    }
 
-        JSONObject currentData = new JSONObject(rawData).getJSONObject("currently");
+    private CurrentData getCurrentData() throws JSONException, IOException {
+        JSONObject currentData = jsonifiedData.getJSONObject("currently");
 
         String locationName = geocoder.getFromLocation(jsonifiedData.getDouble("latitude"),
                 jsonifiedData.getDouble("longitude"), 1).get(0).getLocality();
@@ -45,7 +54,7 @@ public class LocationDataProcessor {
     }
 
 
-    public static HourlyData getHourlyData() throws JSONException {
+    private HourlyData getHourlyData() throws JSONException {
         JSONArray hourlyData = new JSONArray(jsonifiedData.getJSONObject("hourly").getString("data"));
         List<HourlyDataFormat> hourlyDataFormatList = new ArrayList<>();
 
@@ -62,13 +71,13 @@ public class LocationDataProcessor {
         return new HourlyData(hourlyDataFormatList);
     }
 
-    public static DailyData getDailyData() throws JSONException {
+    private DailyData getDailyData() throws JSONException {
         JSONArray dailyData = new JSONArray(jsonifiedData.getJSONObject("daily").getString("data"));
         List<DailyDataFormat> dailyDataFormatList = new ArrayList<>();
 
         for (int i = 0; i < dailyData.length(); i++) {
             JSONObject dailyInfoObject = new JSONObject(dailyData.getString(i));
-            dailyDataFormatList.add(new DailyDataFormat(getDayFromTimestamp(jsonifiedData.getString("timezone"),
+            dailyDataFormatList.add(new DailyDataFormat((i == 0) ? "Today" : getDayFromTimestamp(jsonifiedData.getString("timezone"),
                     dailyInfoObject.getLong("time")), WeatherIconSelector.getWeatherIcon(dailyInfoObject.getString("icon")),
                     dailyInfoObject.getInt("temperatureMin") + " C", dailyInfoObject.getInt("temperatureMax") + " C"));
         }
@@ -76,7 +85,37 @@ public class LocationDataProcessor {
         return new DailyData(dailyDataFormatList);
     }
 
-    private static String getCurrentDateTimeAtTimezone(String timezone, long timestamp, String pattern) {
+    private DetailsData getDetailsData() throws JSONException {
+        JSONObject currentData = jsonifiedData.getJSONObject("currently");
+        JSONArray dailyData = new JSONArray(jsonifiedData.getJSONObject("daily").getString("data"));
+
+        String sunriseTime = getCurrentDateTimeAtTimezone(jsonifiedData.getString("timezone"),
+                new JSONObject(dailyData.getString(0)).getLong("sunriseTime"), "hh:mm aa");
+        String sunsetTime = getCurrentDateTimeAtTimezone(jsonifiedData.getString("timezone"),
+                new JSONObject(dailyData.getString(0)).getLong("sunsetTime"), "hh:mm aa");
+
+        return new DetailsData(getUvIndexLevel(currentData.getInt("uvIndex")), sunriseTime,
+                sunsetTime, (int)(currentData.getDouble("humidity") * 100) + "%");
+    }
+
+    private String getUvIndexLevel(int uvIndex) {
+        String uvIndexLevel;
+        if (uvIndex <= 2) {
+            uvIndexLevel = "Low";
+        }
+        else if (uvIndex <=5) {
+            uvIndexLevel = "Moderate";
+        }
+        else if (uvIndex <= 7) {
+            uvIndexLevel = "High";
+        }
+        else {
+            uvIndexLevel = "Very High";
+        }
+        return uvIndexLevel;
+    }
+
+    private String getCurrentDateTimeAtTimezone(String timezone, long timestamp, String pattern) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date(timestamp*1000));
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
@@ -84,9 +123,24 @@ public class LocationDataProcessor {
         return sdf.format(calendar.getTime());
     }
 
-    private static String getDayFromTimestamp(String timezone, long timestamp) {
+    private String getDayFromTimestamp(String timezone, long timestamp) {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
         sdf.setTimeZone(TimeZone.getTimeZone(timezone));
         return sdf.format(timestamp*1000);
+    }
+
+    @Override
+    protected OverallData doInBackground(Pair<Context, String>... pairs) {
+        try {
+            return new OverallData(getCurrentData(), getHourlyData(), getDailyData(), getDetailsData());
+        }
+        catch (JSONException | IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public OverallData fetchRawWeatherData(Pair<Context, String> pair) throws JSONException, ExecutionException, InterruptedException {
+        return new LocationDataProcessor(pair).execute().get();
     }
 }

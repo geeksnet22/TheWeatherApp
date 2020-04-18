@@ -13,32 +13,34 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="25sp"
+        android:padding="4dp"
         android:textColor="@color/white"/>
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_marginTop="5dp">
+        android:padding="4dp">
         <ImageView
             android:id="@+id/hourlyWeatherIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:foregroundGravity="center"/>
+            android:foregroundGravity="center"
+            android:paddingEnd="2dp"/>
         <TextView
             android:id="@+id/hourlyTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/hourlyWeatherIcon"
-            android:layout_marginStart="5dp"
             android:textSize="25sp"
+            android:paddingStart="2dp"
             android:textColor="@color/white"/>
     </RelativeLayout>
     <TextView
         android:id="@+id/hourlySummary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
+        android:padding="4dp"
         android:textSize="25sp"
         android:textColor="@color/white"/>
 </LinearLayout>
