@@ -7,7 +7,7 @@
     card_view:contentPadding="8dp"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="16dp"
-    card_view:cardBackgroundColor="@color/skyBlue">
+    card_view:cardBackgroundColor="@color/lightSkyBlue">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/hourlyView"

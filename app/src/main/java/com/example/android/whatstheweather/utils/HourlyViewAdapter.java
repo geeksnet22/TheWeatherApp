@@ -22,6 +22,7 @@ public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.Vi
         private TextView time;
         private ImageView weatherIcon;
         private TextView temperature;
+        private TextView precProbability;
         private TextView summary;
 
         ViewHolder(View itemView) {
@@ -29,6 +30,7 @@ public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.Vi
             time = itemView.findViewById(R.id.hourlyTime);
             weatherIcon = itemView.findViewById(R.id.hourlyWeatherIcon);
             temperature = itemView.findViewById(R.id.hourlyTemp);
+            precProbability = itemView.findViewById(R.id.hourlyPrecProbability);
             summary = itemView.findViewById(R.id.hourlySummary);
         }
     }
@@ -54,6 +56,7 @@ public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.Vi
         holder.time.setText(hourlyData.time);
         holder.weatherIcon.setImageResource(hourlyData.icon);
         holder.temperature.setText(hourlyData.temperature);
+        holder.precProbability.setText(hourlyData.precProbability);
         holder.summary.setText(hourlyData.summary);
     }
 

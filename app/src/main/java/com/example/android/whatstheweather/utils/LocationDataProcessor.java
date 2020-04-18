@@ -66,7 +66,8 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
             int icon = WeatherIconSelector.getWeatherIcon(hourlyInfoObject.getString("icon"));
             String temperature = hourlyInfoObject.getInt("temperature") + " C";
             String summary = hourlyInfoObject.getString("summary");
-            hourlyDataFormatList.add(new HourlyDataFormat(datetime, icon, temperature, summary));
+            String precProbability = (int) (hourlyInfoObject.getDouble("precipProbability") * 100) + "%";
+            hourlyDataFormatList.add(new HourlyDataFormat(datetime, icon, temperature, precProbability, summary));
         }
         return new HourlyData(hourlyDataFormatList);
     }
@@ -79,6 +80,7 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
             JSONObject dailyInfoObject = new JSONObject(dailyData.getString(i));
             dailyDataFormatList.add(new DailyDataFormat((i == 0) ? "Today" : getDayFromTimestamp(jsonifiedData.getString("timezone"),
                     dailyInfoObject.getLong("time")), WeatherIconSelector.getWeatherIcon(dailyInfoObject.getString("icon")),
+                    (int) (dailyInfoObject.getDouble("precipProbability") * 100) + "%",
                     dailyInfoObject.getInt("temperatureMin") + " C", dailyInfoObject.getInt("temperatureMax") + " C"));
         }
 

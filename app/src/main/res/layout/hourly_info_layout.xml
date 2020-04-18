@@ -37,6 +37,13 @@
             android:textColor="@color/white"/>
     </RelativeLayout>
     <TextView
+        android:id="@+id/hourlyPrecProbability"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/white"
+        android:paddingBottom="2dp"/>
+    <TextView
         android:id="@+id/hourlySummary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -21,12 +21,14 @@ public class DailyViewAdapter extends RecyclerView.Adapter<DailyViewAdapter.View
 
         private TextView day;
         private ImageView weatherIcon;
+        private TextView precProbability;
         private TextView minMaxTemp;
 
         ViewHolder(View itemView) {
             super(itemView);
             day = itemView.findViewById(R.id.dailyTime);
             weatherIcon = itemView.findViewById(R.id.dailyWeatherIcon);
+            precProbability = itemView.findViewById(R.id.dailyPrecProbability);
             minMaxTemp = itemView.findViewById(R.id.minMaxTemp);
         }
     }
@@ -51,7 +53,8 @@ public class DailyViewAdapter extends RecyclerView.Adapter<DailyViewAdapter.View
 
         holder.day.setText(dailyData.day);
         holder.weatherIcon.setImageResource(dailyData.icon);
-        holder.minMaxTemp.setText(dailyData.minTemp + " - " + dailyData.maxTemp);
+        holder.precProbability.setText(dailyData.precProbability);
+        holder.minMaxTemp.setText(dailyData.minTemp + " to " + dailyData.maxTemp);
     }
 
     @Override
