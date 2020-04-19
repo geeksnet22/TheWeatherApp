@@ -1,8 +1,9 @@
 package com.example.android.whatstheweather.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Address;
+import android.content.SharedPreferences;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
@@ -36,17 +37,17 @@ import com.example.android.whatstheweather.utils.ExtractData;
 import com.example.android.whatstheweather.utils.JSONFileReader;
 import com.example.android.whatstheweather.utils.LocationDataProcessor;
 import com.example.android.whatstheweather.utils.LocationServices;
-import com.google.android.material.navigation.NavigationView;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
     private Geocoder geocoder;
 
@@ -55,32 +56,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private List<String> locationSuggestionsList;
     private ArrayAdapter suggestedLocationsAdaptor;
+    private ListView suggestedLocationsView;
 
     private List<String> favLocationsList;
     private ArrayAdapter favLocationsAdaptor;
-
-    private ListView suggestedLocationsView;
 
     private ListView favLocationsView;
 
     private SearchView searchView;
 
-    private boolean addToFavorites;
-
     private Toolbar toolbar;
+
+    private final String FAV_LOC_PREFS = "FavoriteLocationsPreferences";
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setupRefreshListener(this);
-
         initializeContent(this);
+
+        setupRefreshListener(this);
 
         readJsonFile();
 
-        setupNavigationDrawer();
+        setupFavLocationsNavigationDrawer(this);
 
         fetchDataAndSetupLayout(this);
 
@@ -91,6 +91,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
+
+        Map<String, ?> favLocationsMap = getSharedPreferences("FAV_LOCS", MODE_PRIVATE).getAll();
+
+        for (Map.Entry<String, ?> entry: favLocationsMap.entrySet()) {
+            if (!favLocationsList.contains(entry.getValue().toString())) {
+                favLocationsList.add(entry.getValue().toString());
+            }
+        }
+        favLocationsAdaptor.notifyDataSetChanged();
+
         if (searchView != null) {
             searchView.setQuery("", false);
             searchView.setIconified(true);
@@ -103,31 +113,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         inflater.inflate(R.menu.search_menu, menu);
         MenuItem searchViewItem = menu.findItem(R.id.app_bar_search);
         searchView = (SearchView) searchViewItem.getActionView();
-        searchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((SearchView)v).setIconified(false);
-            }
-        });
-
-        findViewById(R.id.addLocation).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawer.closeDrawer(GravityCompat.START);
-                findViewById(R.id.app_bar_search).callOnClick();
-                addToFavorites = true;
-            }
-        });
 
         setupLocationSearch(searchView, this);
-
-        suggestedLocationsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                searchView.setQuery(suggestedLocationsView.getItemAtPosition(position).toString(), false);
-            }
-        });
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -149,9 +136,56 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        return false;
+    public void setupLocationSearch(final SearchView searchView, final Context context) {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                try {
+                    String rawData = CommonUtilFunctions.getRawDataFromLocationName(query, new Geocoder(context));
+                    if (rawData == null) {
+                        Toast.makeText(context, "Location not found. Please provide more information (eg. country name).", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    suggestedLocationsView.setVisibility(View.INVISIBLE);
+
+                    Intent searchedLocationIntent = new Intent(context, SearchedLocationActivity.class);
+                    searchedLocationIntent.putExtra("rawData", rawData);
+                    searchedLocationIntent.putExtra("location", query);
+                    startActivity(searchedLocationIntent);
+                    return false;
+                }
+                catch (IOException | InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                    return true;
+                }
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.length() == 0) {
+                    suggestedLocationsView.setVisibility(View.INVISIBLE);
+                }
+                else {
+                    suggestedLocationsView.setVisibility(View.VISIBLE);
+                }
+                locationSuggestionsList.clear();
+                suggestedLocationsAdaptor.notifyDataSetChanged();
+                for (Map.Entry<String, Coordinates> e: JSONFileReader.locationMap.entrySet()) {
+                    if (e.getKey().startsWith(newText)) {
+                        locationSuggestionsList.add(e.getKey());
+                        suggestedLocationsAdaptor.notifyDataSetChanged();
+                    }
+                }
+                return false;
+            }
+        });
+
+        suggestedLocationsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                searchView.setQuery(suggestedLocationsView.getItemAtPosition(position).toString(), false);
+            }
+        });
     }
 
     private void setupRefreshListener(final Context context) {
@@ -165,29 +199,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void setupNavigationDrawer() {
+    private void setupFavLocationsNavigationDrawer(final Context context) {
         drawer = findViewById(R.id.drawer_layout);
-        toolbar = findViewById(R.id.toolbar);
         toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-    }
-
-
-    private void initializeContent(final Context context) {
-        geocoder = new Geocoder(this);
-
-
-        addToFavorites = false;
-
-        locationSuggestionsList = new ArrayList<>();
-        suggestedLocationsAdaptor = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locationSuggestionsList);
-        suggestedLocationsView = findViewById(R.id.locationsList);
-        suggestedLocationsView.setAdapter(suggestedLocationsAdaptor);
-        suggestedLocationsView.setVisibility(View.INVISIBLE);
 
         favLocationsList = new ArrayList<String>();
         favLocationsAdaptor = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, favLocationsList);
@@ -201,12 +218,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 try {
                     String rawData = CommonUtilFunctions.getRawDataFromLocationName(favLocationsView.getItemAtPosition(position).toString(), geocoder);
                     intent.putExtra("rawData", rawData);
+                    intent.putExtra("location",favLocationsView.getItemAtPosition(position).toString());
                     startActivity(intent);
                 } catch (ExecutionException | InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
             }
         });
+
+        findViewById(R.id.addLocation).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, AddFavLocationActivity.class);
+                startActivity(intent);
+            }
+        });
+    }
+
+
+    private void initializeContent(final Context context) {
+        geocoder = new Geocoder(this);
+        toolbar = findViewById(R.id.toolbar);
+        locationSuggestionsList = new ArrayList<>();
+        suggestedLocationsAdaptor = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locationSuggestionsList);
+        suggestedLocationsView = findViewById(R.id.locationsList);
+        suggestedLocationsView.setAdapter(suggestedLocationsAdaptor);
+        suggestedLocationsView.setVisibility(View.INVISIBLE);
     }
 
     private void readJsonFile() {
@@ -256,59 +293,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void setupLocationSearch(final SearchView searchView, final Context context) {
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                try {
-                    String rawData = CommonUtilFunctions.getRawDataFromLocationName(query, geocoder);
-                    if (rawData == null) {
-                        Toast.makeText(context, "Location not found. Please provide more information (eg. country name).", Toast.LENGTH_SHORT).show();
-                        return true;
-                    }
-                    suggestedLocationsView.setVisibility(View.INVISIBLE);
 
-                    if ( addToFavorites ) {
-                        addToFavorites = false;
-                        favLocationsList.add(query);
-                        favLocationsAdaptor.notifyDataSetChanged();
-                        searchView.setQuery("", false);
-                        searchView.setIconified(true);
-                        Toast.makeText(context, "Location added to favorites.", Toast.LENGTH_SHORT).show();
-                        drawer.openDrawer(GravityCompat.START);
-                        return false;
-                    }
-
-                    Intent searchedLocationIntent = new Intent(context, SearchedLocationActivity.class);
-                    searchedLocationIntent.putExtra("rawData", rawData);
-                    searchedLocationIntent.putExtra("location", query);
-                    startActivity(searchedLocationIntent);
-                    return false;
-                }
-                catch (IOException | InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                    return true;
-                }
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if (newText.length() == 0) {
-                    suggestedLocationsView.setVisibility(View.INVISIBLE);
-                }
-                else {
-                    suggestedLocationsView.setVisibility(View.VISIBLE);
-                }
-                locationSuggestionsList.clear();
-                suggestedLocationsAdaptor.notifyDataSetChanged();
-                for (Map.Entry<String, Coordinates> e: JSONFileReader.locationMap.entrySet()) {
-                    if (e.getKey().startsWith(newText)) {
-                        locationSuggestionsList.add(e.getKey());
-                        suggestedLocationsAdaptor.notifyDataSetChanged();
-                    }
-                }
-                return false;
-            }
-        });
-    }
 }
