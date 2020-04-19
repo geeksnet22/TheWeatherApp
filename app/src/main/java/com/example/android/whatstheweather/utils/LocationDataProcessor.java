@@ -58,7 +58,7 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
         JSONArray hourlyData = new JSONArray(jsonifiedData.getJSONObject("hourly").getString("data"));
         List<HourlyDataFormat> hourlyDataFormatList = new ArrayList<>();
 
-        for (int i = 0; i < hourlyData.length(); i++) {
+        for (int i = 1; i < hourlyData.length(); i++) {
             JSONObject hourlyInfoObject = new JSONObject(hourlyData.getString(i));
 
             String datetime = getCurrentDateTimeAtTimezone(jsonifiedData.getString("timezone"),
@@ -142,7 +142,7 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
         }
     }
 
-    public OverallData fetchRawWeatherData(Pair<Context, String> pair) throws JSONException, ExecutionException, InterruptedException {
+    public OverallData fetchWeatherData(Pair<Context, String> pair) throws JSONException, ExecutionException, InterruptedException {
         return new LocationDataProcessor(pair).execute().get();
     }
 }
