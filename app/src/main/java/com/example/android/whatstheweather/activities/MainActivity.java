@@ -67,8 +67,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
-    private final String FAV_LOC_PREFS = "FavoriteLocationsPreferences";
-
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupRefreshListener(this);
 
-        readJsonFile();
+//        readJsonFile();
 
         setupFavLocationsNavigationDrawer(this);
 

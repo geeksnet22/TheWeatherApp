@@ -20,7 +20,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:text="@string/hourly_heading"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:textColor="@color/white"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"/>
@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:text="@string/daily_heading"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:textColor="@color/white"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"/>
@@ -42,7 +42,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:text="@string/details_heading"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:textColor="@color/white"
                 android:paddingTop="8dp"
                 android:paddingBottom="8dp"/>

@@ -1,6 +1,7 @@
 package com.example.android.whatstheweather.utils;
 
 import android.content.Context;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,7 +53,6 @@ public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.Vi
     @Override
     public void onBindViewHolder(@NonNull HourlyViewAdapter.ViewHolder holder, int position) {
         HourlyDataFormat hourlyData = hourlyViews.get(position);
-
         holder.time.setText(hourlyData.time);
         holder.weatherIcon.setImageResource(hourlyData.icon);
         holder.temperature.setText(hourlyData.temperature);

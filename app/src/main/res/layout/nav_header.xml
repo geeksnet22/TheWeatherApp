@@ -6,16 +6,16 @@
     android:layout_height="176dp"
     android:padding="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
-    android:background="@color/darkBlue"
+    android:background="@color/skyBlue"
     android:gravity="bottom">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/favLocationsHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingBottom="4dp"
-        android:textSize="20dp"
-        android:text="Favorite Locations"
+        android:textSize="20sp"
+        android:text="@string/fav_locs_heading"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -23,10 +23,20 @@
         android:id="@+id/addLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="15dp"
         android:src="@drawable/plus"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
-        app:layout_constraintStart_toEndOf="@+id/textView"
-        app:layout_constraintTop_toTopOf="@+id/textView" />
+        app:layout_constraintBottom_toBottomOf="@+id/favLocationsHeading"
+        app:layout_constraintStart_toEndOf="@+id/favLocationsHeading"
+        app:layout_constraintTop_toTopOf="@+id/favLocationsHeading" />
+
+    <ImageView
+        android:id="@+id/deleteLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:src="@drawable/minus"
+        app:layout_constraintBottom_toBottomOf="@+id/favLocationsHeading"
+        app:layout_constraintStart_toEndOf="@+id/addLocation"
+        app:layout_constraintTop_toTopOf="@+id/favLocationsHeading"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

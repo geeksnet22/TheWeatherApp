@@ -65,9 +65,19 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
                     hourlyInfoObject.getLong("time"), "hh:mm aa");
             int icon = WeatherIconSelector.getWeatherIcon(hourlyInfoObject.getString("icon"));
             String temperature = hourlyInfoObject.getInt("temperature") + " C";
-            String summary = hourlyInfoObject.getString("summary");
+            String rawSummary = hourlyInfoObject.getString("summary");
+
+            String[] summaryArray= rawSummary.split(" ");
+            StringBuilder summary = new StringBuilder();
+            for (int j = 0; j < summaryArray.length; j++) {
+                summary.append(summaryArray[j]);
+                summary.append(" ");
+                if (j % 2 == 1 && j < summaryArray.length-1) {
+                    summary.append("\n");
+                }
+            }
             String precProbability = (int) (hourlyInfoObject.getDouble("precipProbability") * 100) + "%";
-            hourlyDataFormatList.add(new HourlyDataFormat(datetime, icon, temperature, precProbability, summary));
+            hourlyDataFormatList.add(new HourlyDataFormat(datetime, icon, temperature, precProbability, summary.toString()));
         }
         return new HourlyData(hourlyDataFormatList);
     }

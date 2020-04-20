@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textSize="25sp"
+        android:textSize="20sp"
         android:padding="4dp"
         android:textColor="@color/white"/>
     <RelativeLayout
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toEndOf="@+id/hourlyWeatherIcon"
-            android:textSize="25sp"
+            android:textSize="20sp"
             android:paddingStart="2dp"
             android:textColor="@color/white"/>
     </RelativeLayout>
@@ -45,9 +45,10 @@
         android:paddingBottom="2dp"/>
     <TextView
         android:id="@+id/hourlySummary"
+        android:gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="4dp"
-        android:textSize="25sp"
+        android:textSize="20sp"
         android:textColor="@color/white"/>
 </LinearLayout>

@@ -3,6 +3,7 @@
     <string name="hourly_heading">Hourly</string>
     <string name="daily_heading">Daily</string>
     <string name="details_heading">Details</string>
+    <string name="fav_locs_heading">Favorite Locations</string>
     <string name="min_max_temp">%1$s - %2$s</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
