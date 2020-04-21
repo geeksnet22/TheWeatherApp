@@ -22,10 +22,16 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.android.whatstheweather.R;
 import com.example.android.whatstheweather.types.Coordinates;
 import com.example.android.whatstheweather.utils.CommonUtilFunctions;
+import com.example.android.whatstheweather.utils.DatabaseHandler;
 import com.example.android.whatstheweather.utils.JSONFileReader;
+import com.example.android.whatstheweather.utils.LocationsStorage;
+import com.google.android.gms.common.internal.service.Common;
+
+import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -58,7 +64,11 @@ public class AddFavLocationActivity extends AppCompatActivity {
         searchView = (SearchView) searchViewItem.getActionView();
         searchView.setIconified(false);
 
-        setupLocationSearch();
+        try {
+            setupLocationSearch();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -76,27 +86,32 @@ public class AddFavLocationActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
     }
 
-    private void setupLocationSearch() {
+    private void setupLocationSearch() throws JSONException {
         final Context context = this;
+        DatabaseHandler db = new DatabaseHandler(context);
+        final Map<String, Coordinates> locationsMap = LocationsStorage.isSafeToRead ?
+                LocationsStorage.locationsMap : new HashMap<String, Coordinates>();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 try {
-                    String rawData = CommonUtilFunctions.getRawDataFromLocationName(query, new Geocoder(context));
+                    String rawData = CommonUtilFunctions.getRawDataFromLocationName(query, new Geocoder(context), locationsMap);
                     if (rawData == null) {
                         Toast.makeText(context, "Location not found. Please provide more information (eg. country name).", Toast.LENGTH_SHORT).show();
                         return true;
                     }
-                    suggestedLocationsView.setVisibility(View.INVISIBLE);
+
+                    CommonUtilFunctions.addLocationToStorage(query, new Geocoder(context), new DatabaseHandler(context));
 
                     SharedPreferences.Editor editor = getSharedPreferences("FAV_LOCS", Context.MODE_PRIVATE).edit();
-                    editor.putString(query, query.toUpperCase());
+                    String address = CommonUtilFunctions.getAddressFromLocationName(query, new Geocoder(context), locationsMap);
+                    editor.putString(address, address);
                     editor.apply();
 
-                    Toast.makeText(context, query.toUpperCase() + " added to favorite locations.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, address + " added to favorite locations.", Toast.LENGTH_SHORT).show();
                     return false;
                 }
-                catch (IOException | InterruptedException | ExecutionException e) {
+                catch (IOException | InterruptedException | ExecutionException | JSONException e) {
                     e.printStackTrace();
                     return true;
                 }
@@ -112,7 +127,7 @@ public class AddFavLocationActivity extends AppCompatActivity {
                 }
                 locationSuggestionsList.clear();
                 suggestedLocationsAdaptor.notifyDataSetChanged();
-                for (Map.Entry<String, Coordinates> e: JSONFileReader.locationMap.entrySet()) {
+                for (Map.Entry<String, Coordinates> e: locationsMap.entrySet()) {
                     if (e.getKey().startsWith(newText)) {
                         locationSuggestionsList.add(e.getKey());
                         suggestedLocationsAdaptor.notifyDataSetChanged();

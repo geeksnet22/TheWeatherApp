@@ -153,6 +153,6 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
     }
 
     public OverallData fetchWeatherData(Pair<Context, String> pair) throws JSONException, ExecutionException, InterruptedException {
-        return new LocationDataProcessor(pair).execute().get();
+        return new LocationDataProcessor(pair).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
     }
 }

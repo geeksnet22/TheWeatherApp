@@ -13,24 +13,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.android.whatstheweather.R;
+import com.example.android.whatstheweather.types.Coordinates;
 import com.example.android.whatstheweather.types.OverallData;
 import com.example.android.whatstheweather.utils.CommonUtilFunctions;
 import com.example.android.whatstheweather.utils.DataLayoutSetter;
+import com.example.android.whatstheweather.utils.DatabaseHandler;
 import com.example.android.whatstheweather.utils.LocationDataProcessor;
+import com.example.android.whatstheweather.utils.LocationsStorage;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 public class SearchedLocationActivity extends AppCompatActivity {
 
     private String location;
 
+    private Map<String, Coordinates> locationsMap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_location_searched);
+
+        if (LocationsStorage.isSafeToRead) {
+            locationsMap = LocationsStorage.locationsMap;
+        }
+        else {
+            locationsMap = new HashMap<>();
+        }
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -48,10 +62,11 @@ public class SearchedLocationActivity extends AppCompatActivity {
         setupRefreshListener(this, this);
     }
 
-    private void fetchDataAndSetupLayout(String rawData, boolean fetchRawData, Activity activity, Context context) throws JSONException, ExecutionException, InterruptedException, IOException {
+    private void fetchDataAndSetupLayout(String rawData, boolean fetchRawData, Activity activity, Context context) throws
+            JSONException, ExecutionException, InterruptedException, IOException {
 
         if (fetchRawData) {
-            rawData = CommonUtilFunctions.getRawDataFromLocationName(location, new Geocoder(this));
+            rawData = CommonUtilFunctions.getRawDataFromLocationName(location, new Geocoder(this), locationsMap);
         }
 
         LocationDataProcessor locationDataProcessor = new LocationDataProcessor(new Pair<Context,

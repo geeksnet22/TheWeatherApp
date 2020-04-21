@@ -24,16 +24,15 @@ public class LocationServices {
      * Return user's last known location, return null is location access is not permitted
      * @return user's last known location
      */
-    public Location getLocation(Context context, final Activity activity) {
-        this.promptLocationPermission(context, activity);
+    public Location getLocation(final Activity activity) {
         if (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             return this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }
-        return this.locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        return null;
     }
 
 
-    private void promptLocationPermission(Context context, final Activity activity) {
+    public void promptLocationPermission(Context context, final Activity activity) {
         if (activity.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             /* should we show an explanation */
             if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.ACCESS_FINE_LOCATION))

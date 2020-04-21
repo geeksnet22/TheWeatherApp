@@ -50,6 +50,7 @@
                 android:layout_weight="1"/>
 
             <ImageView
+                android:id="@+id/doneRemovingLocations"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"

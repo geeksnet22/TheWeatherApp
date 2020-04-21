@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Pair;
 import android.view.Menu;
@@ -33,16 +34,17 @@ import com.example.android.whatstheweather.types.Coordinates;
 import com.example.android.whatstheweather.types.OverallData;
 import com.example.android.whatstheweather.utils.CommonUtilFunctions;
 import com.example.android.whatstheweather.utils.DataLayoutSetter;
+import com.example.android.whatstheweather.utils.DatabaseHandler;
 import com.example.android.whatstheweather.utils.ExtractData;
 import com.example.android.whatstheweather.utils.JSONFileReader;
 import com.example.android.whatstheweather.utils.LocationDataProcessor;
 import com.example.android.whatstheweather.utils.LocationServices;
+import com.example.android.whatstheweather.utils.LocationsStorage;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -67,6 +69,12 @@ public class MainActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
+    private boolean removeLocation;
+
+    private DatabaseHandler databaseHandler;
+
+    private LocationServices locationServices;
+
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,35 +82,50 @@ public class MainActivity extends AppCompatActivity {
 
         initializeContent(this);
 
-        setupRefreshListener(this);
+        readJsonFile();
 
-//        readJsonFile();
+        if (locationServices.getLocation(this) != null) {
+            try {
+                fetchDataAndSetupLayout();
+            } catch (InterruptedException | ExecutionException | JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else {
+            locationServices.promptLocationPermission(this, this);
+            findViewById(R.id.mainScroll).setVisibility(View.GONE);
+        }
+
+        setupRefreshListener();
 
         setupFavLocationsNavigationDrawer(this);
 
-        fetchDataAndSetupLayout(this);
-
         setSupportActionBar(toolbar);
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+        suggestedLocationsView.setVisibility(View.INVISIBLE);
         Map<String, ?> favLocationsMap = getSharedPreferences("FAV_LOCS", MODE_PRIVATE).getAll();
-
         for (Map.Entry<String, ?> entry: favLocationsMap.entrySet()) {
             if (!favLocationsList.contains(entry.getValue().toString())) {
                 favLocationsList.add(entry.getValue().toString());
             }
         }
         favLocationsAdaptor.notifyDataSetChanged();
-
         if (searchView != null) {
             searchView.setQuery("", false);
             searchView.setIconified(true);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        databaseHandler.close();
     }
 
     @Override
@@ -139,12 +162,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 try {
-                    String rawData = CommonUtilFunctions.getRawDataFromLocationName(query, new Geocoder(context));
+                    String rawData = CommonUtilFunctions.getRawDataFromLocationName(query, new Geocoder(context),
+                            LocationsStorage.locationsMap);
                     if (rawData == null) {
-                        Toast.makeText(context, "Location not found. Please provide more information (eg. country name).", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "Location not found. Please provide more information " +
+                                "(eg. country name).", Toast.LENGTH_SHORT).show();
                         return true;
                     }
-                    suggestedLocationsView.setVisibility(View.INVISIBLE);
+
+                    CommonUtilFunctions.addLocationToStorage(query, geocoder, databaseHandler);
 
                     Intent searchedLocationIntent = new Intent(context, SearchedLocationActivity.class);
                     searchedLocationIntent.putExtra("rawData", rawData);
@@ -152,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(searchedLocationIntent);
                     return false;
                 }
-                catch (IOException | InterruptedException | ExecutionException e) {
+                catch (IOException | InterruptedException | ExecutionException | JSONException e) {
                     e.printStackTrace();
                     return true;
                 }
@@ -168,10 +194,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 locationSuggestionsList.clear();
                 suggestedLocationsAdaptor.notifyDataSetChanged();
-                for (Map.Entry<String, Coordinates> e: JSONFileReader.locationMap.entrySet()) {
-                    if (e.getKey().startsWith(newText)) {
-                        locationSuggestionsList.add(e.getKey());
-                        suggestedLocationsAdaptor.notifyDataSetChanged();
+                if (LocationsStorage.isSafeToRead) {
+                    for (Map.Entry<String, Coordinates> e: LocationsStorage.locationsMap.entrySet()) {
+                        if (e.getKey().startsWith(newText)) {
+                            locationSuggestionsList.add(e.getKey());
+                            suggestedLocationsAdaptor.notifyDataSetChanged();
+                        }
                     }
                 }
                 return false;
@@ -186,18 +214,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setupRefreshListener(final Context context) {
+    private void setupRefreshListener() {
         final SwipeRefreshLayout pullToRefresh = findViewById(R.id.pullToRefresh);
         pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetchDataAndSetupLayout(context);
+                try {
+                    fetchDataAndSetupLayout();
+                } catch (InterruptedException | ExecutionException | JSONException e) {
+                    e.printStackTrace();
+                }
                 pullToRefresh.setRefreshing(false);
             }
         });
     }
 
     private void setupFavLocationsNavigationDrawer(final Context context) {
+        removeLocation = false;
+        findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
         drawer = findViewById(R.id.drawer_layout);
         toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -212,14 +246,25 @@ public class MainActivity extends AppCompatActivity {
         favLocationsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(context, SearchedLocationActivity.class);
-                try {
-                    String rawData = CommonUtilFunctions.getRawDataFromLocationName(favLocationsView.getItemAtPosition(position).toString(), geocoder);
-                    intent.putExtra("rawData", rawData);
-                    intent.putExtra("location",favLocationsView.getItemAtPosition(position).toString());
-                    startActivity(intent);
-                } catch (ExecutionException | InterruptedException | IOException e) {
-                    e.printStackTrace();
+                if (removeLocation) {
+                    SharedPreferences.Editor editor = getSharedPreferences("FAV_LOCS", MODE_PRIVATE).edit();
+                    editor.remove(favLocationsView.getItemAtPosition(position).toString());
+                    editor.apply();
+                    favLocationsList.remove(position);
+                    favLocationsAdaptor.notifyDataSetChanged();
+                }
+                else {
+                    findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
+                    Intent intent = new Intent(context, SearchedLocationActivity.class);
+                    try {
+                        String rawData = CommonUtilFunctions.getRawDataFromLocationName(favLocationsView.getItemAtPosition(position).toString(),
+                                geocoder, LocationsStorage.locationsMap);
+                        intent.putExtra("rawData", rawData);
+                        intent.putExtra("location",favLocationsView.getItemAtPosition(position).toString());
+                        startActivity(intent);
+                    } catch (ExecutionException | InterruptedException | IOException |JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -231,64 +276,81 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        findViewById(R.id.removeLocation).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeLocation = true;
+                findViewById(R.id.doneRemovingLocations).setVisibility(View.VISIBLE);
+            }
+        });
+
+        findViewById(R.id.doneRemovingLocations).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeLocation = false;
+                findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
+            }
+        });
     }
 
 
     private void initializeContent(final Context context) {
+        /* setup location services */
+        locationServices = new LocationServices((LocationManager) this.getSystemService(Context.LOCATION_SERVICE));
+        LocationsStorage.initializeLocationMap();
+        databaseHandler = new DatabaseHandler(context);
         geocoder = new Geocoder(this);
         toolbar = findViewById(R.id.toolbar);
         locationSuggestionsList = new ArrayList<>();
-        suggestedLocationsAdaptor = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, locationSuggestionsList);
+        suggestedLocationsAdaptor = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
+                locationSuggestionsList);
         suggestedLocationsView = findViewById(R.id.locationsList);
         suggestedLocationsView.setAdapter(suggestedLocationsAdaptor);
         suggestedLocationsView.setVisibility(View.INVISIBLE);
     }
 
     private void readJsonFile() {
+        new JSONFileReader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                new Pair<Context, String>(this, "citylist.json"));
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (permissions.length == 0) {
+            toolbar.setTitle("Home");
+            findViewById(R.id.mainScroll).setVisibility(View.GONE);
+        }
+
         try {
-            if (JSONFileReader.locationMap.isEmpty()){
-                JSONFileReader.readFile(new Pair<Context, String>(this, "citylist.json"));
-            }
-        } catch (ExecutionException | InterruptedException | JSONException e) {
+            findViewById(R.id.mainScroll).setVisibility(View.VISIBLE);
+            fetchDataAndSetupLayout();
+        }
+        catch (InterruptedException | ExecutionException | JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void fetchDataAndSetupLayout(Context context) {
-        /* setup location services */
-        LocationServices locationServices = new LocationServices((LocationManager) this.getSystemService(Context.LOCATION_SERVICE));
+    private void fetchDataAndSetupLayout() throws InterruptedException, ExecutionException,
+            JSONException {
 
         /* get user location */
-        Location userLocation = locationServices.getLocation(this, this);
+        Location userLocation = locationServices.getLocation(this);
+        String rawData = new ExtractData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                userLocation.getLatitude(), userLocation.getLongitude()).get();
 
-        /* if permission to access user's location is granted */
-        if (userLocation != null)
-        {
-            try {
-                String rawData = ExtractData.extractData(userLocation.getLatitude(), userLocation.getLongitude());
+        LocationDataProcessor locationDataProcessor = new LocationDataProcessor(new Pair<Context, String>(this, rawData));
 
-                LocationDataProcessor locationDataProcessor = new LocationDataProcessor(new Pair<Context, String>(context, rawData));
+        OverallData data = locationDataProcessor.fetchWeatherData(new Pair<Context, String>(this, rawData));
 
-                OverallData data = locationDataProcessor.fetchWeatherData(new Pair<Context, String>(this, rawData));
+        toolbar.setTitle(data.currentData.locationName);
 
-                toolbar.setTitle(data.currentData.locationName);
+        DataLayoutSetter.setDataLayout(this, this, data.currentData, data.hourlyData,
+                data.dailyData, data.detailsData);
 
-                DataLayoutSetter.setDataLayout(this, this, data.currentData, data.hourlyData,
-                        data.dailyData, data.detailsData);
-            }
-            catch ( ExecutionException | InterruptedException | JSONException e) {
-                e.printStackTrace();
-                Toast.makeText(this, "Internet not available.", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else {
-            toolbar.setTitle("Home");
-            findViewById(R.id.mainScroll).setVisibility(View.GONE);
-
-            Toast.makeText(context, "Not able to retrive weather information at this moment. Make " +
-                    "sure location access is granted and try refreshing the page by pulling down.", Toast.LENGTH_LONG).show();
-
-        }
     }
 
 
