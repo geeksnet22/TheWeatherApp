@@ -80,7 +80,6 @@ public class AddFavLocationActivity extends AppCompatActivity {
 
         suggestedLocationsView = findViewById(R.id.suggestedLocationsList);
         suggestedLocationsView.setAdapter(suggestedLocationsAdaptor);
-        suggestedLocationsView.setVisibility(View.INVISIBLE);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -95,6 +94,7 @@ public class AddFavLocationActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 try {
+                    searchView.setIconified(true);
                     String rawData = CommonUtilFunctions.getRawDataFromLocationName(query, new Geocoder(context), locationsMap);
                     if (rawData == null) {
                         Toast.makeText(context, "Location not found. Please provide more information (eg. country name).", Toast.LENGTH_SHORT).show();
@@ -119,12 +119,7 @@ public class AddFavLocationActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.length() == 0) {
-                    suggestedLocationsView.setVisibility(View.INVISIBLE);
-                }
-                else {
-                    suggestedLocationsView.setVisibility(View.VISIBLE);
-                }
+                suggestedLocationsView.setVisibility(View.VISIBLE);
                 locationSuggestionsList.clear();
                 suggestedLocationsAdaptor.notifyDataSetChanged();
                 for (Map.Entry<String, Coordinates> e: locationsMap.entrySet()) {

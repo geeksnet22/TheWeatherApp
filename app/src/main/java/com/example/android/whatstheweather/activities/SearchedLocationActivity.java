@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 public class SearchedLocationActivity extends AppCompatActivity {
 
     private String location;
-
+    private Toolbar toolbar;
     private Map<String, Coordinates> locationsMap;
 
     @Override
@@ -46,8 +46,7 @@ public class SearchedLocationActivity extends AppCompatActivity {
             locationsMap = new HashMap<>();
         }
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        toolbar = findViewById(R.id.toolbar);
 
         Intent userLocationIntent = getIntent();
         String rawData = userLocationIntent.getStringExtra("rawData");
@@ -58,7 +57,7 @@ public class SearchedLocationActivity extends AppCompatActivity {
         catch (JSONException | InterruptedException | ExecutionException | IOException e) {
             e.printStackTrace();
         }
-
+        setSupportActionBar(toolbar);
         setupRefreshListener(this, this);
     }
 
@@ -75,6 +74,7 @@ public class SearchedLocationActivity extends AppCompatActivity {
         OverallData data = locationDataProcessor.fetchWeatherData(new Pair<Context,
                 String>(context, rawData));
 
+        toolbar.setTitle(data.currentData.locationName);
         DataLayoutSetter.setDataLayout(activity, context, data.currentData, data.hourlyData,
                 data.dailyData, data.detailsData);
     }
