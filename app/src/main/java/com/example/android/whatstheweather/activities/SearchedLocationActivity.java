@@ -59,6 +59,9 @@ public class SearchedLocationActivity extends AppCompatActivity {
         }
         setSupportActionBar(toolbar);
         setupRefreshListener(this, this);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     private void fetchDataAndSetupLayout(String rawData, boolean fetchRawData, Activity activity, Context context) throws
@@ -92,6 +95,12 @@ public class SearchedLocationActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     @Override

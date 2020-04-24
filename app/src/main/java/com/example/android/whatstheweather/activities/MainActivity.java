@@ -86,6 +86,16 @@ public class MainActivity extends AppCompatActivity {
 
         readJsonFile(this);
 
+        setupRefreshListener();
+
+        setupFavLocationsNavigationDrawer(this, this);
+
+        setSupportActionBar(toolbar);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         if (locationServices.getLocation(this) != null) {
             try {
                 fetchDataAndSetupLayout();
@@ -97,19 +107,6 @@ public class MainActivity extends AppCompatActivity {
             locationServices.promptLocationPermission(this, this);
             findViewById(R.id.mainScroll).setVisibility(View.GONE);
         }
-
-        setupRefreshListener();
-
-        setupFavLocationsNavigationDrawer(this, this);
-
-        setSupportActionBar(toolbar);
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
         suggestedLocationsView.setVisibility(View.INVISIBLE);
         Map<String, ?> favLocationsMap = getSharedPreferences("FAV_LOCS", MODE_PRIVATE).getAll();
         for (Map.Entry<String, ?> entry: favLocationsMap.entrySet()) {
@@ -276,6 +273,8 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.addLocation).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                removeLocation = false;
+                findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
                 Intent intent = new Intent(context, AddFavLocationActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);

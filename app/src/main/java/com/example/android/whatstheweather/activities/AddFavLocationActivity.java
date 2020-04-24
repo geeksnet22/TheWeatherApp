@@ -54,6 +54,9 @@ public class AddFavLocationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_location_fav_add);
 
         initializeContent();
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
     @Override
@@ -71,6 +74,12 @@ public class AddFavLocationActivity extends AppCompatActivity {
         }
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     private void initializeContent() {
