@@ -51,5 +51,7 @@ public class DataLayoutSetter {
         ((TextView) activity.findViewById(R.id.sunrise)).setText(detailsData.sunrise);
         ((TextView) activity.findViewById(R.id.sunset)).setText(detailsData.sunset);
         ((TextView) activity.findViewById(R.id.humidity)).setText(detailsData.humidity);
+        ((TextView) activity.findViewById(R.id.windspeed)).setText(detailsData.windspeed);
+        ((TextView) activity.findViewById(R.id.visibility)).setText(detailsData.visibility);
     }
 }

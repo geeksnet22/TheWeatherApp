@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
         initializeContent(this);
 
-        readJsonFile();
+        readJsonFile(this);
 
         if (locationServices.getLocation(this) != null) {
             try {
@@ -310,10 +311,10 @@ public class MainActivity extends AppCompatActivity {
         suggestedLocationsView.setVisibility(View.INVISIBLE);
     }
 
-    private void readJsonFile() {
-        new JSONFileReader().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                new Pair<Context, String>(this, "citylist.json"));
-
+    private void readJsonFile(Context context) {
+        Intent  intent = new Intent(context, JSONFileReader.class);
+        intent.putExtra("fileName", "citylist.json");
+        startService(intent);
     }
 
     @Override

@@ -30,5 +30,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />
         </activity>
+
+        <service android:name=".utils.JSONFileReader" />
     </application>
 </manifest>

@@ -31,16 +31,15 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
     private Geocoder geocoder;
     private JSONObject jsonifiedData;
 
-    private Pair<Context, String> pair;
-
     public LocationDataProcessor(Pair<Context, String> pair) throws JSONException {
-        this.pair = pair;
         this.geocoder = new Geocoder(pair.first);
         this.jsonifiedData = new JSONObject(pair.second);
     }
 
     private CurrentData getCurrentData() throws JSONException, IOException {
         JSONObject currentData = jsonifiedData.getJSONObject("currently");
+
+        System.out.println("GSB data: " + currentData);
 
         String locationName = geocoder.getFromLocation(jsonifiedData.getDouble("latitude"),
                 jsonifiedData.getDouble("longitude"), 1).get(0).getLocality();
@@ -107,7 +106,9 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
                 new JSONObject(dailyData.getString(0)).getLong("sunsetTime"), "hh:mm aa");
 
         return new DetailsData(getUvIndexLevel(currentData.getInt("uvIndex")), sunriseTime,
-                sunsetTime, (int)(currentData.getDouble("humidity") * 100) + "%");
+                sunsetTime, (int)(currentData.getDouble("humidity") * 100) + "%",
+                (int) currentData.getDouble("windSpeed") + " Km/h",
+                (int) currentData.getDouble("visibility") + " Kms");
     }
 
     private String getUvIndexLevel(int uvIndex) {

@@ -1,8 +1,9 @@
 package com.example.android.whatstheweather.utils;
 
-import android.content.Context;
-import android.os.AsyncTask;
-import android.util.Pair;
+import android.app.IntentService;
+import android.content.Intent;
+
+import androidx.annotation.Nullable;
 
 import com.example.android.whatstheweather.types.Coordinates;
 
@@ -14,14 +15,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-public class JSONFileReader extends AsyncTask<Pair<Context, String>, Void, Map<String, Coordinates>> {
+public class JSONFileReader extends IntentService {
+
+    public JSONFileReader() {
+        super("fileReader");
+    }
 
     @Override
-    protected Map<String, Coordinates> doInBackground(Pair<Context, String>... pairs) {
+    protected void onHandleIntent(@Nullable Intent intent) {
         String fileContent = null;
         try {
             Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-            InputStream is = pairs[0].first.getAssets().open(pairs[0].second);
+            InputStream is = getApplicationContext().getAssets()
+                    .open(intent.getStringExtra("fileName"));
             int size = is.available();
             byte[] buffer = new byte[size];
             is.read(buffer);
@@ -43,13 +49,12 @@ public class JSONFileReader extends AsyncTask<Pair<Context, String>, Void, Map<S
                         locationCoordsObject.getDouble("lat"));
                 LocationsStorage.locationsMap.put(locationName, coordinates);
             }
-            Map<String, Coordinates> dbMap = new DatabaseHandler(pairs[0].first).getAllLocations();
+            Map<String, Coordinates> dbMap = new DatabaseHandler(getApplicationContext()).getAllLocations();
             LocationsStorage.locationsMap.putAll(dbMap);
             LocationsStorage.isSafeToRead = true;
         }
         catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
     }
 }

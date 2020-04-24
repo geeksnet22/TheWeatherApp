@@ -15,4 +15,6 @@
     <string name="sunrise">Sunrise</string>
     <string name="sunset">Sunset</string>
     <string name="humidity">Humidity</string>
+    <string name="windspeed">Windspeed</string>
+    <string name="visibility">Visibility</string>
 </resources>
