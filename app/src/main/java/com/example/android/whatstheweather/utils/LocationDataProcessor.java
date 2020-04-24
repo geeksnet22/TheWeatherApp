@@ -38,9 +38,7 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
 
     private CurrentData getCurrentData() throws JSONException, IOException {
         JSONObject currentData = jsonifiedData.getJSONObject("currently");
-
-        System.out.println("GSB data: " + currentData);
-
+        
         String locationName = geocoder.getFromLocation(jsonifiedData.getDouble("latitude"),
                 jsonifiedData.getDouble("longitude"), 1).get(0).getLocality();
 

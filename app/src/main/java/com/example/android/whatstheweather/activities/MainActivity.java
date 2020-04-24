@@ -1,6 +1,7 @@
 package com.example.android.whatstheweather.activities;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -99,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
         setupRefreshListener();
 
-        setupFavLocationsNavigationDrawer(this);
+        setupFavLocationsNavigationDrawer(this, this);
 
         setSupportActionBar(toolbar);
 
@@ -177,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
                     searchedLocationIntent.putExtra("rawData", rawData);
                     searchedLocationIntent.putExtra("location", query);
                     startActivity(searchedLocationIntent);
+                    overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                     return false;
                 }
                 catch (IOException | InterruptedException | ExecutionException | JSONException e) {
@@ -230,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setupFavLocationsNavigationDrawer(final Context context) {
+    private void setupFavLocationsNavigationDrawer(final Context context, final Activity activity) {
         removeLocation = false;
         findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
         drawer = findViewById(R.id.drawer_layout);
@@ -263,6 +265,7 @@ public class MainActivity extends AppCompatActivity {
                         intent.putExtra("rawData", rawData);
                         intent.putExtra("location",favLocationsView.getItemAtPosition(position).toString());
                         startActivity(intent);
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                     } catch (ExecutionException | InterruptedException | IOException |JSONException e) {
                         e.printStackTrace();
                     }
@@ -275,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(context, AddFavLocationActivity.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
             }
         });
 
