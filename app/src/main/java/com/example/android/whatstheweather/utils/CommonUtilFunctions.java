@@ -39,7 +39,7 @@ public class CommonUtilFunctions {
         List<Address> addresses = geocoder.getFromLocationName(locationName, 1);
         if (addresses.size() > 0) {
             Address address = addresses.get(0);
-            return address.getLocality() + ", " + address.getCountryName();
+            return address.getLocality() + ", " + address.getCountryCode();
         }
         else if (allLocationsMap.containsKey(locationName)) {
             Coordinates coordinates = allLocationsMap.get(locationName);
@@ -52,7 +52,7 @@ public class CommonUtilFunctions {
     public static void addLocationToStorage(String locationName, Geocoder geocoder, DatabaseHandler db)
             throws IOException {
         List<Address> addresses = geocoder.getFromLocationName(locationName, 1);
-        String address = (addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName()).toLowerCase();
+        String address = addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryCode();
         Coordinates coordinates = new Coordinates(addresses.get(0).getLongitude(), addresses.get(0).getLatitude());
         while (!LocationsStorage.isSafeToRead);
         LocationsStorage.isSafeToRead = false;

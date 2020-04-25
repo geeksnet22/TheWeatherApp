@@ -43,7 +43,7 @@ public class JSONFileReader extends IntentService {
             JSONArray locationArray = new JSONArray(fileContent);
             for (int i = 0; i < locationArray.length(); i++) {
                 JSONObject jsonObject = new JSONObject(locationArray.get(i).toString());
-                String locationName = (jsonObject.getString("name") + ", " + jsonObject.getString("country")).toLowerCase();
+                String locationName = jsonObject.getString("name") + ", " + jsonObject.getString("country");
                 JSONObject locationCoordsObject = new JSONObject(jsonObject.getString("coord"));
                 Coordinates coordinates = new Coordinates(locationCoordsObject.getDouble("lon"),
                         locationCoordsObject.getDouble("lat"));

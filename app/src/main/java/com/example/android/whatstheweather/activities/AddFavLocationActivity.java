@@ -132,7 +132,7 @@ public class AddFavLocationActivity extends AppCompatActivity {
                 locationSuggestionsList.clear();
                 suggestedLocationsAdaptor.notifyDataSetChanged();
                 for (Map.Entry<String, Coordinates> e: locationsMap.entrySet()) {
-                    if (e.getKey().startsWith(newText)) {
+                    if (e.getKey().toLowerCase().startsWith(newText.toLowerCase())) {
                         locationSuggestionsList.add(e.getKey());
                         suggestedLocationsAdaptor.notifyDataSetChanged();
                     }

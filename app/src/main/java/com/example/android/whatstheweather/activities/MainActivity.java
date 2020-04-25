@@ -1,10 +1,10 @@
 package com.example.android.whatstheweather.activities;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.drm.DrmStore;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
@@ -14,6 +14,7 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,7 +22,6 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -29,29 +29,35 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.android.whatstheweather.R;
 import com.example.android.whatstheweather.types.Coordinates;
+import com.example.android.whatstheweather.types.FavoriteLocationFormat;
 import com.example.android.whatstheweather.types.OverallData;
 import com.example.android.whatstheweather.utils.CommonUtilFunctions;
 import com.example.android.whatstheweather.utils.DataLayoutSetter;
 import com.example.android.whatstheweather.utils.DatabaseHandler;
 import com.example.android.whatstheweather.utils.ExtractData;
+import com.example.android.whatstheweather.utils.FavoriteLocationAdaptor;
 import com.example.android.whatstheweather.utils.JSONFileReader;
 import com.example.android.whatstheweather.utils.LocationDataProcessor;
 import com.example.android.whatstheweather.utils.LocationServices;
 import com.example.android.whatstheweather.utils.LocationsStorage;
+import com.example.android.whatstheweather.utils.RecyclerViewClickListener;
 
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewClickListener {
 
     private Geocoder geocoder;
 
@@ -62,10 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayAdapter suggestedLocationsAdaptor;
     private ListView suggestedLocationsView;
 
-    private List<String> favLocationsList;
-    private ArrayAdapter favLocationsAdaptor;
-
-    private ListView favLocationsView;
+    private List<FavoriteLocationFormat> favLocationsList;
 
     private SearchView searchView;
 
@@ -76,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseHandler databaseHandler;
 
     private LocationServices locationServices;
+
+    private FavoriteLocationAdaptor favoriteLocationAdaptor;
 
     @Override
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
@@ -110,11 +115,24 @@ public class MainActivity extends AppCompatActivity {
         suggestedLocationsView.setVisibility(View.INVISIBLE);
         Map<String, ?> favLocationsMap = getSharedPreferences("FAV_LOCS", MODE_PRIVATE).getAll();
         for (Map.Entry<String, ?> entry: favLocationsMap.entrySet()) {
-            if (!favLocationsList.contains(entry.getValue().toString())) {
-                favLocationsList.add(entry.getValue().toString());
+            String locationName = entry.getValue().toString();
+            boolean addToLocationsList = true;
+            for (int i = 0; i < favLocationsList.size(); i++) {
+                if (favLocationsList.get(i).locationName.equals(locationName)) {
+                    addToLocationsList = false;
+                    break;
+                }
+            }
+            if (addToLocationsList) {
+                favLocationsList.add(new FavoriteLocationFormat(false, false,
+                        entry.getValue().toString()));
             }
         }
-        favLocationsAdaptor.notifyDataSetChanged();
+        // make sure all checkboxes are hidden
+        for (int i = 0; i < favLocationsList.size(); i++) {
+            favLocationsList.get(i).showCheckbox = false;
+        }
+        favoriteLocationAdaptor.notifyDataSetChanged();
         if (searchView != null) {
             searchView.setQuery("", false);
             searchView.setIconified(true);
@@ -196,7 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 suggestedLocationsAdaptor.notifyDataSetChanged();
                 if (LocationsStorage.isSafeToRead) {
                     for (Map.Entry<String, Coordinates> e: LocationsStorage.locationsMap.entrySet()) {
-                        if (e.getKey().startsWith(newText)) {
+                        if (e.getKey().toLowerCase().startsWith(newText.toLowerCase())) {
                             locationSuggestionsList.add(e.getKey());
                             suggestedLocationsAdaptor.notifyDataSetChanged();
                         }
@@ -230,45 +248,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupFavLocationsNavigationDrawer(final Context context, final Activity activity) {
+
         removeLocation = false;
+        favLocationsList = new ArrayList<>();
+
+        final RecyclerView favLocationView = activity.findViewById(R.id.favoriteLocationsRecyclerView);
+        favoriteLocationAdaptor = new FavoriteLocationAdaptor(favLocationsList, this);
+        favLocationView.setAdapter(favoriteLocationAdaptor);
+        favLocationView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+
         findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
         drawer = findViewById(R.id.drawer_layout);
-        toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        favLocationsList = new ArrayList<String>();
-        favLocationsAdaptor = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, favLocationsList);
-        favLocationsView = findViewById(R.id.favLocationsList);
-        favLocationsView.setAdapter(favLocationsAdaptor);
-
-        favLocationsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (removeLocation) {
-                    SharedPreferences.Editor editor = getSharedPreferences("FAV_LOCS", MODE_PRIVATE).edit();
-                    editor.remove(favLocationsView.getItemAtPosition(position).toString());
-                    editor.apply();
-                    favLocationsList.remove(position);
-                    favLocationsAdaptor.notifyDataSetChanged();
-                }
-                else {
-                    findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
-                    Intent intent = new Intent(context, SearchedLocationActivity.class);
-                    try {
-                        String rawData = CommonUtilFunctions.getRawDataFromLocationName(favLocationsView.getItemAtPosition(position).toString(),
-                                geocoder, LocationsStorage.locationsMap);
-                        intent.putExtra("rawData", rawData);
-                        intent.putExtra("location",favLocationsView.getItemAtPosition(position).toString());
-                        startActivity(intent);
-                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                    } catch (ExecutionException | InterruptedException | IOException |JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
 
         findViewById(R.id.addLocation).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -285,6 +279,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 removeLocation = true;
+                // make all checkboxes visible
+                for (int i = 0; i < favLocationsList.size(); i++) {
+                    favLocationsList.get(i).showCheckbox = true;
+                }
+                favoriteLocationAdaptor.notifyDataSetChanged();
                 findViewById(R.id.doneRemovingLocations).setVisibility(View.VISIBLE);
             }
         });
@@ -293,6 +292,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 removeLocation = false;
+                SharedPreferences.Editor editor = getSharedPreferences("FAV_LOCS", MODE_PRIVATE).edit();
+
+                ArrayList<FavoriteLocationFormat> itemsToBeDeleted = new ArrayList<>();
+
+                for (int i = 0; i < favLocationsList.size(); i++) {
+                    favLocationsList.get(i).showCheckbox = false;
+                    if (favLocationsList.get(i).deleteLocation) {
+                        itemsToBeDeleted.add(favLocationsList.get(i));
+                        editor.remove(favLocationsList.get(i).locationName);
+                    }
+                }
+                editor.apply();
+
+                for (int i = 0; i < itemsToBeDeleted.size(); i++) {
+                    favLocationsList.remove(itemsToBeDeleted.get(i));
+                }
+                favoriteLocationAdaptor.notifyDataSetChanged();
                 findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
             }
         });
@@ -357,5 +373,25 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
+    @Override
+    public void recycleViewListClicked(View v, int position) {
+        if (removeLocation) {
+            favLocationsList.get(position).deleteLocation = !favLocationsList.get(position).deleteLocation;
+            favoriteLocationAdaptor.notifyDataSetChanged();
+        }
+        else {
+            findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
+            Intent intent = new Intent(getApplicationContext(), SearchedLocationActivity.class);
+            try {
+                String rawData = CommonUtilFunctions.getRawDataFromLocationName(favLocationsList.get(position)
+                        .locationName, geocoder, LocationsStorage.locationsMap);
+                intent.putExtra("rawData", rawData);
+                intent.putExtra("location",favLocationsList.get(position).locationName);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+            } catch (ExecutionException | InterruptedException | IOException |JSONException error) {
+                error.printStackTrace();
+            }
+        }
+    }
 }

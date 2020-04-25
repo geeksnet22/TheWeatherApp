@@ -1,7 +1,5 @@
 package com.example.android.whatstheweather.utils;
 
-import android.content.Context;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +35,6 @@ public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.Vi
     }
 
     private List<HourlyDataFormat> hourlyViews;
-
     HourlyViewAdapter(List<HourlyDataFormat> hourlyViews) {
         this.hourlyViews = hourlyViews;
     }
