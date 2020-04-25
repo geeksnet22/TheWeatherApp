@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:src="@drawable/plus"
+        android:src="@drawable/add"
         app:layout_constraintBottom_toBottomOf="@+id/favLocationsHeading"
         app:layout_constraintStart_toEndOf="@+id/favLocationsHeading"
         app:layout_constraintTop_toTopOf="@+id/favLocationsHeading" />
@@ -34,7 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="15dp"
-        android:src="@drawable/minus"
+        android:src="@drawable/remove"
         app:layout_constraintBottom_toBottomOf="@+id/favLocationsHeading"
         app:layout_constraintStart_toEndOf="@+id/addLocation"
         app:layout_constraintTop_toTopOf="@+id/favLocationsHeading"/>
