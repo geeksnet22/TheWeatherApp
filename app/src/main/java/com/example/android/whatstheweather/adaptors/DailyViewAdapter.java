@@ -1,6 +1,5 @@
-package com.example.android.whatstheweather.utils;
+package com.example.android.whatstheweather.adaptors;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,7 @@ public class DailyViewAdapter extends RecyclerView.Adapter<DailyViewAdapter.View
 
     private List<DailyDataFormat> dailyViews;
 
-    DailyViewAdapter(List<DailyDataFormat> dailyViews) {
+    public DailyViewAdapter(List<DailyDataFormat> dailyViews) {
         this.dailyViews = dailyViews;
     }
 

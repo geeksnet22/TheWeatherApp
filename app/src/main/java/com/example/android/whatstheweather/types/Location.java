@@ -1,8 +1,4 @@
-package com.example.android.whatstheweather.utils;
-
-import com.example.android.whatstheweather.types.Coordinates;
-
-import java.time.LocalDate;
+package com.example.android.whatstheweather.types;
 
 public class Location {
 

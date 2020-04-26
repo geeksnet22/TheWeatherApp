@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.drm.DrmStore;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
@@ -14,7 +13,6 @@ import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -41,7 +39,7 @@ import com.example.android.whatstheweather.utils.CommonUtilFunctions;
 import com.example.android.whatstheweather.utils.DataLayoutSetter;
 import com.example.android.whatstheweather.utils.DatabaseHandler;
 import com.example.android.whatstheweather.utils.ExtractData;
-import com.example.android.whatstheweather.utils.FavoriteLocationAdaptor;
+import com.example.android.whatstheweather.adaptors.FavoriteLocationAdaptor;
 import com.example.android.whatstheweather.utils.JSONFileReader;
 import com.example.android.whatstheweather.utils.LocationDataProcessor;
 import com.example.android.whatstheweather.utils.LocationServices;
@@ -51,7 +49,6 @@ import com.example.android.whatstheweather.utils.RecyclerViewClickListener;
 import org.json.JSONException;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -86,15 +83,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     protected void onCreate(@Nullable final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initializeContent(this);
-
         readJsonFile(this);
-
         setupRefreshListener();
-
         setupFavLocationsNavigationDrawer(this, this);
-
         setSupportActionBar(toolbar);
     }
 

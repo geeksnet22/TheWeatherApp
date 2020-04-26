@@ -1,6 +1,5 @@
-package com.example.android.whatstheweather.utils;
+package com.example.android.whatstheweather.adaptors;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.whatstheweather.R;
 import com.example.android.whatstheweather.types.FavoriteLocationFormat;
+import com.example.android.whatstheweather.utils.RecyclerViewClickListener;
 
 import java.util.List;
 

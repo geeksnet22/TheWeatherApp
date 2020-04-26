@@ -2,7 +2,6 @@ package com.example.android.whatstheweather.utils;
 
 import android.app.Activity;
 import android.content.Context;
-import android.view.ActionProvider;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -10,6 +9,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.android.whatstheweather.R;
+import com.example.android.whatstheweather.adaptors.DailyViewAdapter;
+import com.example.android.whatstheweather.adaptors.HourlyViewAdapter;
 import com.example.android.whatstheweather.types.CurrentData;
 import com.example.android.whatstheweather.types.DailyData;
 import com.example.android.whatstheweather.types.DetailsData;

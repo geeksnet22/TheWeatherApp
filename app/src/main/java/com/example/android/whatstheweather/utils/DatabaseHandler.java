@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.android.whatstheweather.types.Coordinates;
+import com.example.android.whatstheweather.types.Location;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 

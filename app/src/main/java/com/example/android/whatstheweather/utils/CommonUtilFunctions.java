@@ -5,15 +5,14 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 
 import com.example.android.whatstheweather.types.Coordinates;
+import com.example.android.whatstheweather.types.Location;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 public class CommonUtilFunctions {
 

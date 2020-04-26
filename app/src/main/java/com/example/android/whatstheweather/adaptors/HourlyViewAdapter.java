@@ -1,4 +1,4 @@
-package com.example.android.whatstheweather.utils;
+package com.example.android.whatstheweather.adaptors;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +35,7 @@ public class HourlyViewAdapter extends RecyclerView.Adapter<HourlyViewAdapter.Vi
     }
 
     private List<HourlyDataFormat> hourlyViews;
-    HourlyViewAdapter(List<HourlyDataFormat> hourlyViews) {
+    public HourlyViewAdapter(List<HourlyDataFormat> hourlyViews) {
         this.hourlyViews = hourlyViews;
     }
 
