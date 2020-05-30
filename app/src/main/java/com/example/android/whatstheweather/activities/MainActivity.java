@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         if (locationServices.getLocation(this) != null) {
             try {
                 fetchDataAndSetupLayout();
-            } catch (InterruptedException | ExecutionException | JSONException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
@@ -188,8 +188,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
                     overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                     return false;
                 }
-                catch (IOException | InterruptedException | ExecutionException | JSONException e) {
+                catch (IOException | InterruptedException | ExecutionException e) {
                     e.printStackTrace();
+                    Toast.makeText(context, "Please check internet connection.", Toast.LENGTH_SHORT).show();
                     return true;
                 }
             }
@@ -231,8 +232,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
             public void onRefresh() {
                 try {
                     fetchDataAndSetupLayout();
-                } catch (InterruptedException | ExecutionException | JSONException e) {
+                } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
+                    Toast.makeText(MainActivity.this, "Please check internet connection.", Toast.LENGTH_SHORT).show();
                 }
                 pullToRefresh.setRefreshing(false);
             }
@@ -332,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
+        /* permission has not been granted*/
         if (permissions.length == 0) {
             toolbar.setTitle("Home");
             findViewById(R.id.mainScroll).setVisibility(View.GONE);
@@ -341,28 +344,39 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
             findViewById(R.id.mainScroll).setVisibility(View.VISIBLE);
             fetchDataAndSetupLayout();
         }
-        catch (InterruptedException | ExecutionException | JSONException e) {
+        catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
     }
 
-    private void fetchDataAndSetupLayout() throws InterruptedException, ExecutionException,
-            JSONException {
+    private void fetchDataAndSetupLayout() throws InterruptedException, ExecutionException {
 
         /* get user location */
         Location userLocation = locationServices.getLocation(this);
-        String rawData = new ExtractData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-                userLocation.getLatitude(), userLocation.getLongitude()).get();
 
-        LocationDataProcessor locationDataProcessor = new LocationDataProcessor(new Pair<Context, String>(this, rawData));
+        if (userLocation != null) {
+            String rawData = new ExtractData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                    userLocation.getLatitude(), userLocation.getLongitude()).get();
 
-        OverallData data = locationDataProcessor.fetchWeatherData(new Pair<Context, String>(this, rawData));
-
-        toolbar.setTitle(data.currentData.locationName);
-
-        DataLayoutSetter.setDataLayout(this, this, data.currentData, data.hourlyData,
-                data.dailyData, data.detailsData);
-
+            try {
+                LocationDataProcessor locationDataProcessor = new LocationDataProcessor(new Pair<Context, String>(this, rawData));
+                OverallData data = locationDataProcessor.fetchWeatherData(new Pair<Context, String>(this, rawData));
+                toolbar.setTitle(data.currentData.locationName);
+                if (findViewById(R.id.mainScroll).getVisibility() != View.VISIBLE) {
+                    findViewById(R.id.mainScroll).setVisibility(View.VISIBLE);
+                }
+                DataLayoutSetter.setDataLayout(this, this, data.currentData, data.hourlyData,
+                        data.dailyData, data.detailsData);
+            }
+            catch (JSONException e) {
+                toolbar.setTitle("Home");
+                findViewById(R.id.mainScroll).setVisibility(View.INVISIBLE);
+                Toast.makeText(this, "Please check you internet connection", Toast.LENGTH_LONG).show();
+            }
+        }
+        else {
+            toolbar.setTitle("Home");
+        }
     }
 
     @Override
@@ -373,17 +387,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         }
         else {
             findViewById(R.id.doneRemovingLocations).setVisibility(View.GONE);
-            Intent intent = new Intent(getApplicationContext(), SearchedLocationActivity.class);
-            try {
-                String rawData = CommonUtilFunctions.getRawDataFromLocationName(favLocationsList.get(position)
-                        .locationName, geocoder, LocationsStorage.locationsMap);
-                intent.putExtra("rawData", rawData);
-                intent.putExtra("location",favLocationsList.get(position).locationName);
-                startActivity(intent);
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-            } catch (ExecutionException | InterruptedException | IOException |JSONException error) {
-                error.printStackTrace();
-            }
+            Intent intent = new Intent(getApplicationContext(), FavLocationActivity.class);
+            intent.putExtra("location",favLocationsList.get(position).locationName);
+            startActivity(intent);
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
         }
     }
 }

@@ -12,6 +12,6 @@ public class LocationsStorage {
 
     public synchronized static void initializeLocationMap() {
         locationsMap = new HashMap<>();
-        isSafeToRead = false;
+        isSafeToRead = true;
     }
 }

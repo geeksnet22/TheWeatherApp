@@ -38,6 +38,7 @@ public class JSONFileReader extends IntentService {
             e.printStackTrace();
         }
 
+        while (!LocationsStorage.isSafeToRead);
         LocationsStorage.isSafeToRead = false;
         try {
             JSONArray locationArray = new JSONArray(fileContent);

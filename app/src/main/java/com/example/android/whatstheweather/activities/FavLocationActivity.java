@@ -1,42 +1,46 @@
 package com.example.android.whatstheweather.activities;
 
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.appcompat.widget.Toolbar;
-
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.android.whatstheweather.R;
 import com.example.android.whatstheweather.utils.CommonUtilFunctions;
+import com.example.android.whatstheweather.utils.LocationsStorage;
 
 import org.json.JSONException;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
-public class SearchedLocationActivity extends AppCompatActivity {
+public class FavLocationActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_location_searched);
+        setContentView(R.layout.activity_location_fav);
 
         toolbar = findViewById(R.id.toolbar);
 
         String location = getIntent().getStringExtra("location");
-        String rawData = getIntent().getStringExtra("rawData");
         try {
-            CommonUtilFunctions.setupRefreshListener(toolbar, location,this, this);
+
+            CommonUtilFunctions.setupRefreshListener(toolbar, location, this, this);
+            String rawData = CommonUtilFunctions.getRawDataFromLocationName(location,
+                    new Geocoder(this), LocationsStorage.locationsMap);
             CommonUtilFunctions.fetchDataAndSetupLayout(toolbar, rawData, location,false,
                     this, this);
-        }
-        catch (JSONException | InterruptedException | ExecutionException | IOException e) {
+        } catch (ExecutionException | InterruptedException | IOException | JSONException e) {
             e.printStackTrace();
-            setSupportActionBar(toolbar);
             findViewById(R.id.mainScroll).setVisibility(View.INVISIBLE);
+            toolbar.setTitle(location);
+            setSupportActionBar(toolbar);
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -54,4 +58,3 @@ public class SearchedLocationActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }
-

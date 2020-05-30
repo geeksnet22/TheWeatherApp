@@ -120,7 +120,7 @@ public class AddFavLocationActivity extends AppCompatActivity {
                     Toast.makeText(context, address + " added to favorite locations.", Toast.LENGTH_SHORT).show();
                     return false;
                 }
-                catch (IOException | InterruptedException | ExecutionException | JSONException e) {
+                catch (IOException | InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                     return true;
                 }
