@@ -1,0 +1,2 @@
+# TheWeatherApp
+Tracks user's current location and shows current and forecasted (hourly and daily) forecasted weather conditions. User is able to               search for a location to get live weather information. User is  also able to add/remove their favourite locations to quickly access  weather information. Also stores a collection of approximately               23000 worldwide locations, used to provide search suggestions. Missing locations are added to the collection on a successful search.
