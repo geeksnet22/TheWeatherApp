@@ -34,19 +34,25 @@ public class CommonUtilFunctions {
         private Geocoder geocoder;
 
         private String locationName;
+
         private double latitude;
         private double longitude;
 
         private boolean getFromLocationName;
 
-        private GeocoderOperations(Geocoder geocoder, String locationName, double latitude,
-                                   double longitude, boolean getFromLocationName) {
+        private GeocoderOperations(Geocoder geocoder, String locationName) {
             this.geocoder = geocoder;
             this.locationName = locationName;
+
+            this.getFromLocationName = true;
+        }
+
+        private GeocoderOperations(Geocoder geocoder, double latitude, double longitude) {
+            this.geocoder = geocoder;
             this.latitude = latitude;
             this.longitude = longitude;
 
-            this.getFromLocationName = getFromLocationName;
+            this.getFromLocationName = false;
         }
 
         @Override
@@ -63,20 +69,21 @@ public class CommonUtilFunctions {
         }
 
         List<Address> getAddressesFromLocationName() throws ExecutionException, InterruptedException {
-            return new GeocoderOperations(this.geocoder, this.locationName, this.latitude, this.longitude,
-                    true).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
+            return new GeocoderOperations(this.geocoder, this.locationName)
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
         }
 
         List<Address> getAddressesFromLocationCoordinates() throws ExecutionException, InterruptedException {
-            return new GeocoderOperations(this.geocoder, this.locationName, this.latitude, this.latitude,
-                    false).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
+            return new GeocoderOperations(this.geocoder, this.latitude, this.latitude)
+                    .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR).get();
         }
     }
 
     public static String getRawDataFromLocationName(String locationName, Geocoder geocoder,
                                                     Map<String, Coordinates> allLocationsMap)
             throws ExecutionException, InterruptedException, IOException {
-        List<Address> addresses = new GeocoderOperations(geocoder, locationName, 0, 0, true).getAddressesFromLocationName();
+        List<Address> addresses = new GeocoderOperations(geocoder, locationName)
+                .getAddressesFromLocationName();
         if (addresses.size() > 0) {
             Address address = addresses.get(0);
             return new ExtractData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
@@ -96,7 +103,8 @@ public class CommonUtilFunctions {
     public static String getAddressFromLocationName(String locationName, Geocoder geocoder, Map<String,
             Coordinates> allLocationsMap)
             throws IOException, ExecutionException, InterruptedException {
-        List<Address> addresses = new GeocoderOperations(geocoder, locationName, 0, 0, true).getAddressesFromLocationName();
+        List<Address> addresses = new GeocoderOperations(geocoder, locationName)
+                .getAddressesFromLocationName();
         if (addresses.size() > 0) {
             Address address = addresses.get(0);
             return address.getLocality() + ", " + address.getCountryCode();
@@ -106,8 +114,8 @@ public class CommonUtilFunctions {
         if (allLocationsMap.containsKey(locationName)) {
             Coordinates coordinates = allLocationsMap.get(locationName);
             LocationsStorage.isSafeToRead = true;
-            addresses = new GeocoderOperations(geocoder, "", coordinates.latitude, coordinates.longitude,
-                    false).getAddressesFromLocationCoordinates();
+            addresses = new GeocoderOperations(geocoder, coordinates.latitude, coordinates.longitude)
+                    .getAddressesFromLocationCoordinates();
             return addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryName();
         }
         return null;
@@ -115,7 +123,7 @@ public class CommonUtilFunctions {
 
     public static void addLocationToStorage(String locationName, Geocoder geocoder, DatabaseHandler db)
             throws ExecutionException, InterruptedException {
-        List<Address> addresses = new GeocoderOperations(geocoder, locationName, 0, 0, true).getAddressesFromLocationName();
+        List<Address> addresses = new GeocoderOperations(geocoder, locationName).getAddressesFromLocationName();
         String address = addresses.get(0).getLocality() + ", " + addresses.get(0).getCountryCode();
         Coordinates coordinates = new Coordinates(addresses.get(0).getLongitude(), addresses.get(0).getLatitude());
         while (!LocationsStorage.isSafeToRead);
