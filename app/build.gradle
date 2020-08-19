@@ -46,6 +46,9 @@ dependencies {
     implementation 'androidx.navigation:navigation-fragment:2.2.1'
     implementation 'androidx.navigation:navigation-ui:2.2.1'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.0.0'
+
+    api 'com.google.guava:guava:28.0-android'
+
     testImplementation 'junit:junit:4.12'
 
 }
