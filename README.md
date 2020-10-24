@@ -3,3 +3,5 @@ Tracks user's current location and shows current and forecasted (hourly and dail
 
 
 ![image](https://user-images.githubusercontent.com/29005515/97068440-e2cec480-1584-11eb-896d-7165a7b9a1c8.png)
+
+<img src="https://user-images.githubusercontent.com/29005515/97068440-e2cec480-1584-11eb-896d-7165a7b9a1c8.png" width="100" height="100"/>
