@@ -27,7 +27,8 @@
         android:src="@drawable/add"
         app:layout_constraintBottom_toBottomOf="@+id/favLocationsHeading"
         app:layout_constraintStart_toEndOf="@+id/favLocationsHeading"
-        app:layout_constraintTop_toTopOf="@+id/favLocationsHeading" />
+        app:layout_constraintTop_toTopOf="@+id/favLocationsHeading"
+        android:contentDescription="@string/addLocation" />
 
     <ImageView
         android:id="@+id/removeLocation"

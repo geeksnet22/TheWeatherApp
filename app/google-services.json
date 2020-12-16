@@ -10,7 +10,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:356841186889:android:38407ddc1d8796bb",
         "android_client_info": {
-          "package_name": "com.example.android.whatstheweather"
+          "package_name": "com.weatherapp.android.whatstheweather"
         }
       },
       "oauth_client": [
@@ -18,7 +18,7 @@
           "client_id": "356841186889-g33l2imvq55094940846k3c87et7h3fe.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.android.whatstheweather",
+            "package_name": "com.weatherapp.android.whatstheweather",
             "certificate_hash": "ce751fb18c2bf4aaa2c35e0c8183d6ebb2c30b01"
           }
         },

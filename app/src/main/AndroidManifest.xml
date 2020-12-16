@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.android.whatstheweather" >
+    package="com.weatherapp.android.whatstheweather" >
 
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
@@ -15,7 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true" >
-        <activity android:name=".activities.MainActivity"
+        <activity android:name="com.weatherapp.android.whatstheweather.activities.MainActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <intent-filter>
@@ -23,26 +23,26 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.SearchedLocationActivity"
+        <activity android:name="com.weatherapp.android.whatstheweather.activities.SearchedLocationActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
+                android:value="com.weatherapp.android.whatstheweather.activities.MainActivity" />
         </activity>
-        <activity android:name=".activities.AddFavLocationActivity"
+        <activity android:name="com.weatherapp.android.whatstheweather.activities.AddFavLocationActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.MainActivity" />
+                android:value="com.weatherapp.android.whatstheweather.activities.MainActivity" />
         </activity>
-        <activity android:name=".activities.FavLocationActivity"
+        <activity android:name="com.weatherapp.android.whatstheweather.activities.FavLocationActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity">
             <meta-data android:name="android.support.PARENT_ACTIVITY"
-            android:value=".activities.MainActivity" />
+            android:value="com.weatherapp.android.whatstheweather.activities.MainActivity" />
         </activity>
-        <service android:name=".utils.JSONFileReader" />
+        <service android:name="com.weatherapp.android.whatstheweather.utils.JSONFileReader" />
     </application>
 </manifest>

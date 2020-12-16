@@ -55,7 +55,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 android:padding="16dp"
-                android:src="@drawable/ok" />
+                android:src="@drawable/ok"
+                android:contentDescription="@string/doneRemovingLocations" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

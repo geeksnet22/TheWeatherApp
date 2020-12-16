@@ -17,4 +17,10 @@
     <string name="humidity">Humidity</string>
     <string name="windspeed">Windspeed</string>
     <string name="visibility">Visibility</string>
+    <string name="doneRemovingLocations">Done Removing Locations</string>
+    <string name="userLocationPin">User Location Pin</string>
+    <string name="currentWeatherIcon">Current Weather Icon</string>
+    <string name="dailyWeatherIcon">Daily Weather Icon</string>
+    <string name="hourlyWeatherIcon">Daily Weather Icon</string>
+    <string name="addLocation">Add Location</string>
 </resources>

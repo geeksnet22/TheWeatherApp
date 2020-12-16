@@ -16,7 +16,8 @@
             android:id="@+id/userLocationPin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/userLocationPin" />
         <TextView
             android:id="@+id/userLocationName"
             android:layout_width="wrap_content"
@@ -44,7 +45,8 @@
             android:layout_height="wrap_content"
             android:foregroundGravity="center"
             android:paddingEnd="2dp"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true"
+            android:contentDescription="@string/currentWeatherIcon" />
         <TextView
             android:id="@+id/currentTemp"
             android:layout_width="wrap_content"
