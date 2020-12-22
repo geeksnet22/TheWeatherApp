@@ -106,7 +106,7 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
 
         return new DetailsData(getUvIndexLevel(currentData.getInt("uvIndex")), sunriseTime,
                 sunsetTime, (int)(currentData.getDouble("humidity") * 100) + "%",
-                (int) currentData.getDouble("windSpeed") + " Km/h",
+                (int) currentData.getDouble("windSpeed") + " Kph",
                 (int) currentData.getDouble("visibility") + " Kms");
     }
 
