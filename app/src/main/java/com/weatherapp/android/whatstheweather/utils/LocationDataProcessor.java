@@ -47,7 +47,8 @@ public class LocationDataProcessor extends AsyncTask<Pair<Context, String>, Void
                 currentData.getLong("time"), "yyyy-MM-dd hh:mm:ss aa");
 
         return new CurrentData(locationName, currentData.getString("summary"),
-                currentData.getInt("temperature") + " C", datetime,
+                currentData.getInt("temperature") + " C",
+                "Feels like " + currentData.getInt("apparentTemperature") + " C", datetime,
                 WeatherIconSelector.getWeatherIcon(currentData.getString("icon")));
     }
 

@@ -338,7 +338,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
         if (userLocation != null) {
             String rawData = new ExtractData().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
                     userLocation.getLatitude(), userLocation.getLongitude()).get();
-
             try {
                 LocationDataProcessor locationDataProcessor = new LocationDataProcessor(new Pair<Context, String>(this, rawData));
                 OverallData data = locationDataProcessor.fetchWeatherData(new Pair<Context, String>(this, rawData));
@@ -352,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewClick
             catch (JSONException e) {
                 toolbar.setTitle("Home");
                 findViewById(R.id.mainScroll).setVisibility(View.INVISIBLE);
-                Toast.makeText(this, "Please check you internet connection", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Please check your internet connection", Toast.LENGTH_LONG).show();
             }
         }
         else {

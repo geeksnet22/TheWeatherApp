@@ -41,6 +41,7 @@ public class DataLayoutSetter {
     private static void setupCurrentInfoLayout(Activity activity, CurrentData currentData) {
         ((TextView) activity.findViewById(R.id.userLocationName)).setText(currentData.locationName);
         ((TextView) activity.findViewById(R.id.currentTime)).setText(currentData.dateTime);
+        ((TextView) activity.findViewById(R.id.currentApparentTemp)).setText(currentData.apparentTemperature);
         ((ImageView) activity.findViewById(R.id.currentWeatherIcon)).setImageResource(currentData.icon);
         ((TextView) activity.findViewById(R.id.currentTemp)).setText(currentData.temperature);
         ((TextView) activity.findViewById(R.id.currentSummary)).setText(currentData.summary);
