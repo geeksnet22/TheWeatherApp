@@ -16,7 +16,7 @@ public class ExtractData extends AsyncTask<Double, Void, String> {
     protected String doInBackground(Double... params) {
         final ForecastRequest request = new ForecastRequestBuilder().key(new APIKey("7d7c4d51abd38384fd51a174d0771a5d"))
                 .location(new GeoCoordinates(new Longitude(params[1]), new Latitude(params[0])))
-                .language(ForecastRequestBuilder.Language.en).units(ForecastRequestBuilder.Units.si)
+                .language(ForecastRequestBuilder.Language.en).units(ForecastRequestBuilder.Units.ca)
                 .build();
 
         DarkSkyClient client = new DarkSkyClient();
